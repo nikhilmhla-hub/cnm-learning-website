@@ -1,0 +1,47 @@
+export const coursesData = [
+  {
+    id: "jee-11th",
+    title: "Visual JEE Foundation — Class 11 PCM",
+    target: "Class 11 Aspirants",
+    price: "₹29,999/-",
+    originalPrice: "[Original list price]",
+    features: [
+      "Full Class 11 PCM Visual Concept Lessons",
+      "Topic-wise Microtests & Daily Practice Papers",
+      "Animated Formula Cheat Sheets",
+      "Doubt-Solving Support via Chat & Video",
+      "Weekly Mentorship & Rank Tracking",
+    ],
+    popular: false,
+  },
+  {
+    id: "jee-12th",
+    title: "Visual JEE Accelerator — Class 12 PCM",
+    target: "Class 12 Aspirants",
+    price: "₹29,999/-",
+    originalPrice: "[Original list price]",
+    features: [
+      "Full Class 12 PCM Syllabus + Class 11 Revision",
+      "IITian-Mode Problem-Solving Sessions",
+      "Full Syllabus Mock Tests with Accuracy Trackers",
+      "Doubt-Solving Support via Chat & Video",
+      "Weekly Mentorship & Rank Tracking",
+    ],
+    popular: true,
+  },
+  {
+    id: "jee-dropper",
+    title: "Visual JEE Rank Booster — Dropper Batch PCM",
+    target: "Class 12 Passed / Droppers",
+    price: "₹49,999/-",
+    originalPrice: "[Original list price]",
+    features: [
+      "Intensive 1-Year Full PCM Target Coverage",
+      "High-Yield Problem Solving & Rank Accelerator",
+      "All India Mock Series & Weakness Analytics",
+      "Priority 1-on-1 Mentorship & Doubt Resolution",
+      "Smart Revision Schedules & Challenge Events",
+    ],
+    popular: false,
+  },
+];

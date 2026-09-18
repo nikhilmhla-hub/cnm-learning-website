@@ -15,12 +15,17 @@ import SyllabusSection from "./components/sections/SyllabusSection";
 import ComparisonSection from "./components/sections/ComparisonSection";
 import DreamSection from "./components/sections/DreamSection";
 import EngagementSection from "./components/sections/EngagementSection";
+
+// Supporting Product Capability Sections
+import PerformanceAssessmentSection from "./components/sections/PerformanceAssessmentSection";
+import StudentDashboardSection from "./components/sections/StudentDashboardSection";
+
 import FinalCTASection from "./components/sections/FinalCTASection";
 import ContactSection from "./components/sections/ContactSection";
 
 export default function Home() {
   return (
-    <>
+    <div style={{ backgroundColor: "var(--color-background)", minHeight: "100vh" }}>
       <Navbar />
       <main>
         <HeroSection />
@@ -37,10 +42,12 @@ export default function Home() {
         <ComparisonSection />
         <DreamSection />
         <EngagementSection />
+        <PerformanceAssessmentSection />
+        <StudentDashboardSection />
         <FinalCTASection />
         <ContactSection />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

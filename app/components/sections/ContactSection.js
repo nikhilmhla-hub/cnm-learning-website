@@ -1,24 +1,65 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 export default function ContactSection() {
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const node = sectionRef.current;
+    if (!node) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -60px 0px",
+      }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      if (node) observer.unobserve(node);
+    };
+  }, []);
+
   return (
     <section
       id="contact"
+      ref={sectionRef}
       className="section"
       style={{
         backgroundColor: "var(--color-background)",
         padding: "5rem 0",
         display: "flex",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <div
-        className="container"
+        className={`container contact-container ${isMounted ? "js-active" : ""} ${isVisible ? "is-visible" : ""}`}
         style={{
           display: "flex",
           justifyContent: "center",
           width: "100%",
           padding: "0 1rem",
+          overflow: "hidden",
         }}
       >
         <div
@@ -32,6 +73,7 @@ export default function ContactSection() {
             maxWidth: "560px",
             boxShadow: "0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.08)",
             boxSizing: "border-box",
+            transitionDelay: isMounted && isVisible ? "200ms" : "0ms",
           }}
         >
           {/* Heading */}
@@ -56,12 +98,14 @@ export default function ContactSection() {
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {/* Item 1: Email */}
             <div
+              className="contact-item"
               style={{
                 display: "flex",
                 gap: "1.25rem",
                 alignItems: "flex-start",
                 paddingBottom: "1.25rem",
                 borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                transitionDelay: isMounted && isVisible ? "350ms" : "0ms",
               }}
             >
               <div
@@ -126,12 +170,14 @@ export default function ContactSection() {
 
             {/* Item 2: Phone No. */}
             <div
+              className="contact-item"
               style={{
                 display: "flex",
                 gap: "1.25rem",
                 alignItems: "flex-start",
                 paddingBottom: "1.25rem",
                 borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                transitionDelay: isMounted && isVisible ? "450ms" : "0ms",
               }}
             >
               <div
@@ -193,10 +239,12 @@ export default function ContactSection() {
 
             {/* Item 3: Address */}
             <div
+              className="contact-item"
               style={{
                 display: "flex",
                 gap: "1.25rem",
                 alignItems: "flex-start",
+                transitionDelay: isMounted && isVisible ? "550ms" : "0ms",
               }}
             >
               <div
@@ -255,7 +303,45 @@ export default function ContactSection() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        /* Contact card & items reveal */
+        .contact-card,
+        .contact-item {
+          will-change: transform, opacity;
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .contact-container.js-active:not(.is-visible) .contact-card {
+          opacity: 0;
+          transform: translateY(20px) scale(0.97);
+        }
+
+        .contact-container.js-active:not(.is-visible) .contact-item {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+
+        .contact-container.js-active.is-visible .contact-card {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+
+        .contact-container.js-active.is-visible .contact-item {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .contact-card,
+          .contact-item {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
-

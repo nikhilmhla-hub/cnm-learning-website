@@ -7,11 +7,15 @@ import { testimonialsData } from "../../data/testimonials";
 
 export default function TestimonialsSection({ testimonials = testimonialsData }) {
   const scrollRef = useRef(null);
+  const sectionRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Detect prefers-reduced-motion
   useEffect(() => {
+    setIsMounted(true);
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mediaQuery.matches);
     const listener = (e) => setReducedMotion(e.matches);
@@ -19,6 +23,38 @@ export default function TestimonialsSection({ testimonials = testimonialsData })
       mediaQuery.addEventListener("change", listener);
       return () => mediaQuery.removeEventListener("change", listener);
     }
+  }, []);
+
+  // IntersectionObserver for entrance reveal
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      if (node) observer.unobserve(node);
+    };
   }, []);
 
   // Smooth continuous auto-scroll Left -> Right
@@ -48,13 +84,14 @@ export default function TestimonialsSection({ testimonials = testimonialsData })
   const doubleTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section id="testimonials" className="section section-alt">
-      <div className="container" style={{ overflow: "hidden" }}>
+    <section id="testimonials" ref={sectionRef} className="section section-alt" style={{ overflow: "hidden" }}>
+      <div className={`container testimonials-container ${isMounted ? "js-active" : ""} ${isVisible ? "is-visible" : ""}`} style={{ overflow: "hidden" }}>
         <SectionHeading
           eyebrow="PROVEN RESULTS"
           title="See What Our Toppers Say"
           description="Hear how CNM Learning helped thousands crack JEE with confidence and clarity."
           centered
+          className="testimonials-header"
         />
 
         {/* Testimonial Carousel Track (Single Horizontal Row) */}
@@ -75,8 +112,9 @@ export default function TestimonialsSection({ testimonials = testimonialsData })
             padding: "1rem 0.5rem 1.5rem 0.5rem",
             scrollbarWidth: "none",
             msOverflowStyle: "none",
+            transitionDelay: isMounted && isVisible ? "260ms" : "0ms",
           }}
-          className="no-scrollbar"
+          className="no-scrollbar testimonials-track"
         >
           {doubleTestimonials.map((item, idx) => (
             <div
@@ -181,7 +219,14 @@ export default function TestimonialsSection({ testimonials = testimonialsData })
         </div>
 
         {/* CTA Button Below Carousel */}
-        <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
+        <div
+          className="testimonials-cta"
+          style={{
+            textAlign: "center",
+            marginTop: "2.5rem",
+            transitionDelay: isMounted && isVisible ? "420ms" : "0ms",
+          }}
+        >
           <Button href="#pricing" variant="primary" style={{ padding: "0.95rem 2.25rem" }}>
             Yes! I Want to Become an IITian
           </Button>
@@ -189,13 +234,88 @@ export default function TestimonialsSection({ testimonials = testimonialsData })
       </div>
 
       <style jsx>{`
+        /* Header sequence */
+        :global(.testimonials-header .eyebrow),
+        :global(.testimonials-header .section-title),
+        :global(.testimonials-header .section-description) {
+          will-change: transform, opacity;
+          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .testimonials-container.js-active:not(.is-visible) :global(.testimonials-header .eyebrow) {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+
+        .testimonials-container.js-active:not(.is-visible) :global(.testimonials-header .section-title) {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+
+        .testimonials-container.js-active:not(.is-visible) :global(.testimonials-header .section-description) {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+
+        .testimonials-container.js-active.is-visible :global(.testimonials-header .eyebrow) {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 0ms;
+        }
+
+        .testimonials-container.js-active.is-visible :global(.testimonials-header .section-title) {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 100ms;
+        }
+
+        .testimonials-container.js-active.is-visible :global(.testimonials-header .section-description) {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 200ms;
+        }
+
+        /* Carousel track & CTA soft entrance */
+        .testimonials-track,
+        .testimonials-cta {
+          will-change: transform, opacity;
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .testimonials-container.js-active:not(.is-visible) .testimonials-track,
+        .testimonials-container.js-active:not(.is-visible) .testimonials-cta {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        .testimonials-container.js-active.is-visible .testimonials-track,
+        .testimonials-container.js-active.is-visible .testimonials-cta {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
+
         @media (max-width: 640px) {
           :global(.card-interactive) {
             flex: 0 0 85vw !important;
             min-width: 85vw !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          :global(.testimonials-header .eyebrow),
+          :global(.testimonials-header .section-title),
+          :global(.testimonials-header .section-description),
+          .testimonials-track,
+          .testimonials-cta {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
           }
         }
       `}</style>

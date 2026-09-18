@@ -1,27 +1,37 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import VideoPlaceholder from "../ui/VideoPlaceholder";
 
 export default function HeroSection() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
-    <section id="home" className="section bg-ambient-gold" style={{ paddingTop: "4rem", paddingBottom: "5rem" }}>
-      <div className="container" style={{ textAlign: "center", maxWidth: "1100px" }}>
+    <section id="home" className="section bg-ambient-gold" style={{ paddingTop: "4rem", paddingBottom: "5rem", overflow: "hidden" }}>
+      <div className={`container hero-container ${isMounted ? "hero-animated" : ""}`} style={{ textAlign: "center", maxWidth: "1100px", overflow: "hidden" }}>
         {/* 1. Eyebrow */}
-        <span className="eyebrow" style={{ marginBottom: "1.25rem" }}>
-          <span
-            style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              backgroundColor: "var(--color-gold-bright)",
-            }}
-          />
-          "Go Visual, Even a beginner gets it instantly"
-        </span>
+        <div className="hero-elem hero-eyebrow">
+          <span className="eyebrow" style={{ marginBottom: "1.25rem" }}>
+            <span
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                backgroundColor: "var(--color-gold-bright)",
+              }}
+            />
+            "Go Visual, Even a beginner gets it instantly"
+          </span>
+        </div>
 
         {/* 2. Main Dominant Headline */}
         <h1
+          className="hero-elem hero-headline"
           style={{
             fontSize: "clamp(2.5rem, 6vw, 4.2rem)",
             fontWeight: 800,
@@ -36,6 +46,7 @@ export default function HeroSection() {
 
         {/* 3. Subheading / Second Line */}
         <p
+          className="hero-elem hero-subheading"
           style={{
             fontFamily: "var(--font-family-heading)",
             fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
@@ -50,6 +61,7 @@ export default function HeroSection() {
 
         {/* 4. Supporting Statement */}
         <p
+          className="hero-elem hero-supporting"
           style={{
             fontSize: "clamp(1rem, 2vw, 1.2rem)",
             color: "var(--color-text-secondary)",
@@ -63,6 +75,7 @@ export default function HeroSection() {
 
         {/* 5. Main Instructor Video Player Area */}
         <div
+          className="hero-elem hero-video"
           style={{
             maxWidth: "960px",
             width: "100%",
@@ -78,6 +91,7 @@ export default function HeroSection() {
 
         {/* 6. Hero CTA Row Below Video */}
         <div
+          className="hero-elem hero-cta"
           style={{
             display: "flex",
             alignItems: "center",
@@ -114,6 +128,7 @@ export default function HeroSection() {
 
         {/* 7. Supporting Enrollment Note */}
         <p
+          className="hero-elem hero-note"
           style={{
             marginTop: "1.25rem",
             fontSize: "0.85rem",
@@ -126,9 +141,48 @@ export default function HeroSection() {
       </div>
 
       <style jsx>{`
+        .hero-elem {
+          will-change: transform, opacity;
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-container:not(.hero-animated) .hero-elem {
+          opacity: 0;
+        }
+
+        .hero-container:not(.hero-animated) .hero-eyebrow { transform: translateY(12px); }
+        .hero-container:not(.hero-animated) .hero-headline { transform: translateY(22px); }
+        .hero-container:not(.hero-animated) .hero-subheading { transform: translateY(18px); }
+        .hero-container:not(.hero-animated) .hero-supporting { transform: translateY(16px); }
+        .hero-container:not(.hero-animated) .hero-video { transform: translateY(28px) scale(0.98); }
+        .hero-container:not(.hero-animated) .hero-cta { transform: translateY(18px); }
+        .hero-container:not(.hero-animated) .hero-note { transform: translateY(12px); }
+
+        .hero-container.hero-animated .hero-elem {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+
+        .hero-container.hero-animated .hero-eyebrow { transition-delay: 0ms; }
+        .hero-container.hero-animated .hero-headline { transition-delay: 100ms; }
+        .hero-container.hero-animated .hero-subheading { transition-delay: 180ms; }
+        .hero-container.hero-animated .hero-supporting { transition-delay: 260ms; }
+        .hero-container.hero-animated .hero-video { transition-delay: 380ms; }
+        .hero-container.hero-animated .hero-cta { transition-delay: 500ms; }
+        .hero-container.hero-animated .hero-note { transition-delay: 600ms; }
+
         @media (max-width: 640px) {
           :global(.btn) {
             width: 100% !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-elem {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
           }
         }
       `}</style>

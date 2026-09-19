@@ -1,137 +1,107 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import SectionHeading from "../ui/SectionHeading";
 import Button from "../ui/Button";
 
 export default function FinalCTASection() {
-  const sectionRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    const node = sectionRef.current;
-    if (!node) return;
-
-    if (!("IntersectionObserver" in window)) {
-      setIsVisible(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -60px 0px",
-      }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      if (node) observer.unobserve(node);
-    };
-  }, []);
-
   return (
-    <section ref={sectionRef} className="section section-gold-accent bg-ambient-gold" style={{ overflow: "hidden" }}>
-      <div className={`container final-cta-container ${isMounted ? "js-active" : ""} ${isVisible ? "is-visible" : ""}`} style={{ textAlign: "center", maxWidth: "820px", overflow: "hidden" }}>
-        <SectionHeading
-          eyebrow="50% Discount - Founding Members Offer"
-          title="Grab Access To CNM Learning Today!"
-          description="Join thousands of students mastering Physics, Chemistry, and Maths with 3D clarity."
-          centered
-          className="final-cta-header"
-        />
-        <div style={{ marginTop: "2rem", display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-          <div className="cta-btn-wrapper" style={{ transitionDelay: isMounted && isVisible ? "320ms" : "0ms" }}>
-            <Button href="#pricing" variant="primary">Yes! I Want to Become an IITian</Button>
+    <section
+      id="audit"
+      style={{
+        padding: "6rem 0",
+        backgroundColor: "var(--color-background)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background Accent */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.12) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
+        <div
+          style={{
+            maxWidth: "900px",
+            margin: "0 auto",
+            backgroundColor: "var(--color-surface)",
+            border: "2px solid var(--color-border-gold)",
+            borderRadius: "var(--radius-xl)",
+            padding: "3.5rem 2.5rem",
+            textAlign: "center",
+            boxShadow: "0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(212, 175, 55, 0.15)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.78rem",
+              fontWeight: 800,
+              letterSpacing: "0.15em",
+              color: "var(--color-gold-bright)",
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+            }}
+          >
+            STUDENT PERFORMANCE INTELLIGENCE PROTOCOL
           </div>
-          <div className="cta-btn-wrapper" style={{ transitionDelay: isMounted && isVisible ? "440ms" : "0ms" }}>
-            <Button href="#videos" variant="secondary">Watch a Free Demo Lesson</Button>
+
+          <h2
+            style={{
+              fontSize: "clamp(2.2rem, 4.5vw, 3.4rem)",
+              fontWeight: 800,
+              lineHeight: 1.15,
+              color: "#ffffff",
+              marginBottom: "1rem",
+            }}
+          >
+            Stop Guessing. <br />
+            <span className="text-gold">Start Diagnosing.</span>
+          </h2>
+
+          <p
+            style={{
+              fontSize: "1.1rem",
+              color: "var(--color-text-secondary)",
+              maxWidth: "600px",
+              margin: "0 auto 2.25rem auto",
+              lineHeight: 1.6,
+            }}
+          >
+            Find exactly where your preparation is leaking marks — focus, accuracy, revision, time, or exam pressure — and convert those findings into a measurable 90-day plan.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: "1.25rem",
+            }}
+          >
+            <Button href="#audit" variant="primary" style={{ padding: "0.95rem 2.25rem", fontSize: "1rem" }}>
+              RUN YOUR CNM PERFORMANCE AUDIT →
+            </Button>
+            <Button href="#how-it-works" variant="secondary" style={{ padding: "0.95rem 1.75rem", fontSize: "1rem" }}>
+              EXPLORE CNM SYSTEM LABS
+            </Button>
+          </div>
+
+          <div
+            style={{
+              marginTop: "2rem",
+              fontSize: "0.75rem",
+              color: "var(--color-text-muted)",
+              letterSpacing: "0.08em",
+            }}
+          >
+            DIAGNOSE • PLAN • EXECUTE • MEASURE • IMPROVE
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        /* Header sequence */
-        :global(.final-cta-header .eyebrow),
-        :global(.final-cta-header .section-title),
-        :global(.final-cta-header .section-description) {
-          will-change: transform, opacity;
-          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .final-cta-container.js-active:not(.is-visible) :global(.final-cta-header .eyebrow) {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-
-        .final-cta-container.js-active:not(.is-visible) :global(.final-cta-header .section-title) {
-          opacity: 0;
-          transform: translateY(20px) scale(0.98);
-        }
-
-        .final-cta-container.js-active:not(.is-visible) :global(.final-cta-header .section-description) {
-          opacity: 0;
-          transform: translateY(14px);
-        }
-
-        .final-cta-container.js-active.is-visible :global(.final-cta-header .eyebrow) {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 0ms;
-        }
-
-        .final-cta-container.js-active.is-visible :global(.final-cta-header .section-title) {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-          transition-delay: 100ms;
-        }
-
-        .final-cta-container.js-active.is-visible :global(.final-cta-header .section-description) {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 200ms;
-        }
-
-        /* CTA Buttons Entrance */
-        .cta-btn-wrapper {
-          will-change: transform, opacity;
-          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .final-cta-container.js-active:not(.is-visible) .cta-btn-wrapper {
-          opacity: 0;
-          transform: translateY(16px);
-        }
-
-        .final-cta-container.js-active.is-visible .cta-btn-wrapper {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          :global(.final-cta-header .eyebrow),
-          :global(.final-cta-header .section-title),
-          :global(.final-cta-header .section-description),
-          .cta-btn-wrapper {
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

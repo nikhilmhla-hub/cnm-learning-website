@@ -16,8 +16,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata = {
-  title: "CNM Learning | Premier IIT-JEE Visual Preparation",
-  description: "Official CNM Learning platform offering 3D visual learning resources and expert IITian mentorship.",
+  title: "CNM System Labs | Student Performance Intelligence",
+  description: "CNM System Labs helps students identify performance gaps, build structured study systems, analyze test performance and track measurable academic improvement.",
 };
 
 export default function RootLayout({ children }) {

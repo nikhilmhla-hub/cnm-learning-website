@@ -1,220 +1,143 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import SectionHeading from "../ui/SectionHeading";
-import { faqData } from "../../data/faq";
 
-export default function FAQSection({ faqs = faqData }) {
-  const sectionRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [openId, setOpenId] = useState(null);
+export default function FAQSection() {
+  const [openIdx, setOpenIdx] = useState(0);
 
-  useEffect(() => {
-    setIsMounted(true);
-    const node = sectionRef.current;
-    if (!node) return;
-
-    if (!("IntersectionObserver" in window)) {
-      setIsVisible(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -60px 0px",
-      }
-    );
-
-    observer.observe(node);
-
-    return () => {
-      if (node) observer.unobserve(node);
-    };
-  }, []);
-
-  const toggleFaq = (id) => {
-    setOpenId(openId === id ? null : id);
-  };
+  const faqs = [
+    {
+      q: "What exactly does CNM System Labs do?",
+      a: "CNM System Labs is a student performance intelligence system. We identify why a student is underperforming, where marks are being lost, and why study hours aren't converting into test scores, then build a personalized execution plan to fix those root causes.",
+    },
+    {
+      q: "Is this another online coaching platform?",
+      a: "No. Traditional coaching platforms focus primarily on delivering lectures and problem sheets. CNM System Labs focuses on the feedback loop behind your studying — focus endurance, accuracy, test autopsy, spaced revision, and daily execution discipline.",
+    },
+    {
+      q: "Does CNM replace school or coaching?",
+      a: "No. CNM System Labs complements your existing school or coaching institute. It acts as the diagnostic control room for your preparation, ensuring the effort you put into your coaching actually translates into test marks.",
+    },
+    {
+      q: "What does the Performance Audit measure?",
+      a: "The Performance Audit evaluates 8 core domains: Focus Endurance, Solving Accuracy, Revision Recall, Mock Test Analysis, Time Management, Exam Confidence, Execution Discipline, and Rank Trajectory.",
+    },
+    {
+      q: "Can CNM identify why my marks are stuck?",
+      a: "Yes. Stagnant marks are usually caused by specific unexamined leaks (e.g. careless errors, formula decay, or mismanaging test time). CNM isolates the exact bottleneck so you know what to fix next.",
+    },
+    {
+      q: "How does CNM use mock-test data?",
+      a: "Instead of merely displaying your overall score, CNM deconstructs your test paper into 8 error categories (concept gap, misread question, calculation error, time pressure, weak topic, etc.) so your next study session directly targets mark loss.",
+    },
+    {
+      q: "What happens after the audit?",
+      a: "After the audit, CNM generates a 90-Day Rank Blueprint and daily mission plan tailored to your specific performance leaks, along with structured focus block protocols.",
+    },
+    {
+      q: "Can parents see student progress?",
+      a: "Yes. Parents get objective, signal-based dashboards showing study consistency, focus endurance, active interventions, and revision progress without relying on vague academic arguments.",
+    },
+    {
+      q: "Can schools and coaching institutes use CNM?",
+      a: "Yes. CNM System Labs provides multi-student telemetry for institutions, helping mentors detect batch-wide topic weaknesses, identify students needing intervention, and monitor revision consistency.",
+    },
+    {
+      q: "Does CNM guarantee rank improvement?",
+      a: "No system can guarantee a specific rank or admission result. CNM System Labs is designed to identify performance gaps, create targeted interventions, and track execution and improvement over time. Results vary by student starting point and daily execution.",
+    },
+  ];
 
   return (
-    <section id="faq" ref={sectionRef} className="section section-alt" style={{ overflow: "hidden" }}>
-      <div className={`container faq-container ${isMounted ? "js-active" : ""} ${isVisible ? "is-visible" : ""}`} style={{ maxWidth: "840px", overflow: "hidden" }}>
+    <section
+      id="about"
+      style={{
+        padding: "5.5rem 0",
+        backgroundColor: "var(--color-background-alt)",
+        borderBottom: "1px solid var(--color-border-subtle)",
+      }}
+    >
+      <div className="container">
         <SectionHeading
-          eyebrow="Got Questions?"
-          title="Frequently Asked Questions"
-          description="Everything you need to know about CNM Learning courses and enrollment."
-          centered
-          className="faq-header"
+          eyebrow="FREQUENTLY ASKED QUESTIONS"
+          title="Everything You Need to Know About CNM System Labs"
+          description="Clear, honest answers about our diagnostic methodology, product system, and implementation."
+          center={true}
         />
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", marginTop: "2rem" }}>
-          {faqs.map((faq, index) => {
-            const isOpen = openId === faq.id;
 
+        <div
+          style={{
+            maxWidth: "850px",
+            margin: "3.5rem auto 0 auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
+          {faqs.map((faq, idx) => {
+            const isOpen = openIdx === idx;
             return (
               <div
-                key={faq.id}
-                tabIndex={0}
-                role="button"
-                aria-expanded={isOpen}
-                onClick={() => toggleFaq(faq.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleFaq(faq.id);
-                  }
-                }}
-                className={`card card-interactive faq-item-card ${isOpen ? "is-open" : ""}`}
+                key={faq.q}
                 style={{
-                  cursor: "pointer",
-                  transitionDelay: isMounted && isVisible ? `${250 + index * 70}ms` : "0ms",
+                  backgroundColor: "var(--color-surface)",
+                  border: isOpen ? "1px solid var(--color-border-gold)" : "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  overflow: "hidden",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
-                  <h4 style={{ fontSize: "1.1rem", margin: 0, color: "#ffffff", fontWeight: 700 }}>
-                    {faq.question}
-                  </h4>
-                  <div
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(212, 175, 55, 0.12)",
-                      border: "1px solid rgba(212, 175, 55, 0.3)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "var(--color-gold)",
-                      flexShrink: 0,
-                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.3s ease",
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
-                  </div>
-                </div>
-
-                <div
-                  className="faq-answer-wrapper"
+                <button
+                  onClick={() => setOpenIdx(isOpen ? -1 : idx)}
                   style={{
-                    display: "grid",
-                    gridTemplateRows: isOpen ? "1fr" : "0fr",
-                    transition: "grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-                    overflow: "hidden",
+                    width: "100%",
+                    padding: "1.25rem 1.5rem",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    color: "#ffffff",
+                    textAlign: "left",
+                    fontSize: "1.05rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "1rem",
                   }}
                 >
-                  <div style={{ minHeight: 0 }}>
-                    <p
-                      style={{
-                        fontSize: "0.95rem",
-                        color: "var(--color-text-secondary)",
-                        lineHeight: "1.6",
-                        marginTop: isOpen ? "0.85rem" : "0rem",
-                        paddingTop: isOpen ? "0.5rem" : "0rem",
-                        borderTop: isOpen ? "1px solid rgba(255, 255, 255, 0.08)" : "none",
-                        opacity: isOpen ? 1 : 0,
-                        transition: "opacity 0.25s ease, margin 0.3s ease",
-                      }}
-                    >
-                      {faq.answer}
-                    </p>
+                  <span>{faq.q}</span>
+                  <span
+                    style={{
+                      fontSize: "1.2rem",
+                      color: isOpen ? "var(--color-gold-bright)" : "var(--color-text-muted)",
+                      transition: "transform 0.2s ease",
+                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    +
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <div
+                    style={{
+                      padding: "0 1.5rem 1.25rem 1.5rem",
+                      fontSize: "0.92rem",
+                      color: "var(--color-text-secondary)",
+                      lineHeight: 1.6,
+                      borderTop: "1px solid var(--color-border-subtle)",
+                      paddingTop: "1rem",
+                    }}
+                  >
+                    {faq.a}
                   </div>
-                </div>
+                )}
               </div>
             );
           })}
         </div>
       </div>
-
-      <style jsx>{`
-        /* Header sequence */
-        :global(.faq-header .eyebrow),
-        :global(.faq-header .section-title),
-        :global(.faq-header .section-description) {
-          will-change: transform, opacity;
-          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .faq-container.js-active:not(.is-visible) :global(.faq-header .eyebrow) {
-          opacity: 0;
-          transform: translateY(14px);
-        }
-
-        .faq-container.js-active:not(.is-visible) :global(.faq-header .section-title) {
-          opacity: 0;
-          transform: translateY(22px);
-        }
-
-        .faq-container.js-active:not(.is-visible) :global(.faq-header .section-description) {
-          opacity: 0;
-          transform: translateY(16px);
-        }
-
-        .faq-container.js-active.is-visible :global(.faq-header .eyebrow) {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 0ms;
-        }
-
-        .faq-container.js-active.is-visible :global(.faq-header .section-title) {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 100ms;
-        }
-
-        .faq-container.js-active.is-visible :global(.faq-header .section-description) {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 200ms;
-        }
-
-        /* FAQ Card entrance */
-        .faq-item-card {
-          will-change: transform, opacity;
-          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                      border-color 0.25s ease,
-                      box-shadow 0.25s ease;
-        }
-
-        .faq-container.js-active:not(.is-visible) .faq-item-card {
-          opacity: 0;
-          transform: translateY(18px);
-        }
-
-        .faq-container.js-active.is-visible .faq-item-card {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .faq-item-card.is-open {
-          border-color: var(--color-border-gold);
-          box-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          :global(.faq-header .eyebrow),
-          :global(.faq-header .section-title),
-          :global(.faq-header .section-description),
-          .faq-item-card {
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

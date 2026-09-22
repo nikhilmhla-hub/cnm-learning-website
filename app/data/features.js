@@ -2,7 +2,7 @@ export const featuresData = [
   {
     id: 1,
     title: "Interactive Learning Environment with Animations",
-    description: "Learn concepts the way your brain loves — visually with animated derivations and intuitive experiments.",
+    description: "Learn concepts the way your brain loves - visually with animated derivations and intuitive experiments.",
   },
   {
     id: 2,

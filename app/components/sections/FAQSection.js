@@ -13,7 +13,7 @@ export default function FAQSection() {
     },
     {
       q: "Is this another online coaching platform?",
-      a: "No. Traditional coaching platforms focus primarily on delivering lectures and problem sheets. CNM System Labs focuses on the feedback loop behind your studying — focus endurance, accuracy, test autopsy, spaced revision, and daily execution discipline.",
+      a: "No. Traditional coaching platforms focus primarily on delivering lectures and problem sheets. CNM System Labs focuses on the feedback loop behind your studying - focus endurance, accuracy, test autopsy, spaced revision, and daily execution discipline.",
     },
     {
       q: "Does CNM replace school or coaching?",

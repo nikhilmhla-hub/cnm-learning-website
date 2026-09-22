@@ -43,7 +43,7 @@ export default function LearningKitSection() {
   const differentiators = [
     {
       label: "Visual-First",
-      detail: "3D animated concept breakdowns — not static slides or blackboards.",
+      detail: "3D animated concept breakdowns - not static slides or blackboards.",
     },
     {
       label: "IITian Faculty",
@@ -51,11 +51,11 @@ export default function LearningKitSection() {
     },
     {
       label: "Clarity Guaranteed",
-      detail: "If you don't understand a concept visually, you see it again — differently.",
+      detail: "If you don't understand a concept visually, you see it again - differently.",
     },
     {
-      label: "Full JEE Coverage",
-      detail: "Physics, Chemistry & Maths — Class 11 & 12 — aligned to the latest JEE syllabus.",
+      label: "Full Coverage",
+      detail: "Physics, Chemistry & Maths - Class 11 & 12 - aligned to the latest JEE syllabus.",
     },
     {
       label: "Mentored Weekly",
@@ -87,7 +87,7 @@ export default function LearningKitSection() {
             <SectionHeading
               eyebrow="THE CNM ADVANTAGE"
               title="No Other Programme Prepares You Like CNM Learning"
-              description="We don't just teach — we transform how your brain processes Physics, Chemistry, and Mathematics. Here's what sets every CNM student apart."
+              description="We don't just teach - we transform how your brain processes Physics, Chemistry, and Mathematics. Here's what sets every CNM student apart."
             />
           </div>
 

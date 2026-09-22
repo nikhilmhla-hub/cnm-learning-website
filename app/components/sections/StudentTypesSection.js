@@ -131,9 +131,28 @@ export default function StudentTypesSection() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: "3rem" }}>
-          <Button href="#audit" variant="primary" style={{ padding: "0.85rem 1.75rem" }}>
+          <a
+            href="https://cnm-online-audit.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              padding: "0.85rem 1.75rem",
+              borderRadius: "var(--radius-md)",
+              textDecoration: "none",
+              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
+              transition: "all 0.2s ease",
+            }}
+          >
             FIND YOUR PERFORMANCE PROFILE →
-          </Button>
+          </a>
         </div>
       </div>
     </section>

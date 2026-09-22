@@ -56,7 +56,7 @@ export default function SyllabusSection() {
   ];
 
   const points = [
-    "Learn concepts the way your brain loves — visually.",
+    "Learn concepts the way your brain loves - visually.",
     "Active student community",
     "Weekly mentorship sessions and doubt-clearing support",
     "Topic-wise notes & cheat sheets",
@@ -75,7 +75,7 @@ export default function SyllabusSection() {
         <SectionHeading
           eyebrow="COMPLETE PREPARATION"
           title="FULL SYLLABUS TESTS AND MENTORING"
-          description="Learn concepts the way your brain loves — visually with structured tests and personal mentorship."
+          description="Learn concepts the way your brain loves - visually with structured tests and personal mentorship."
           centered
           className="syllabus-header"
         />

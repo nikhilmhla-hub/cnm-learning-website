@@ -75,7 +75,7 @@ export default function PerformanceReportSection() {
             <SectionHeading
               eyebrow="KNOW WHERE YOU STAND"
               title="Know Where You Stand Before You Plan What Comes Next"
-              description="CNM's performance assessment helps you understand your current preparation, identify weaker areas, and see what needs more attention — so your effort is always aimed at the right place."
+              description="CNM's performance assessment helps you understand your current preparation, identify weaker areas, and see what needs more attention - so your effort is always aimed at the right place."
               className="pr-heading"
             />
 
@@ -263,7 +263,7 @@ export default function PerformanceReportSection() {
                         Assessed
                       </span>
                     </div>
-                    {/* Track Bar — structural only, no fake % */}
+                    {/* Track Bar - structural only, no fake % */}
                     <div
                       style={{
                         height: "5px",
@@ -341,7 +341,7 @@ export default function PerformanceReportSection() {
                   lineHeight: 1.5,
                 }}
               >
-                Illustrative structure — actual report is personalised to your preparation.
+                Illustrative structure - actual report is personalised to your preparation.
               </p>
             </div>
           </div>
@@ -457,7 +457,7 @@ export default function PerformanceReportSection() {
             0 0 20px rgba(212, 175, 55, 0.08);
         }
 
-        /* Category rows — staggered bar animation on card reveal */
+        /* Category rows - staggered bar animation on card reveal */
         .pr-cat-row {
           animation: none;
         }

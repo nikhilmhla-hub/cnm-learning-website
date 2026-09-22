@@ -1,9 +1,153 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
-import Button from "../ui/Button";
 
 export default function IllustrativeAuditSection() {
+  const [inView, setInView] = useState(false);
+  const [scoreVal, setScoreVal] = useState(60);
+  const [hoveredCard, setHoveredCard] = useState(null);
+
+  const sectionRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // Scroll Trigger via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Score Count-up when section enters view
+  useEffect(() => {
+    if (!inView) return;
+
+    let start = 60;
+    const target = 74;
+    const interval = setInterval(() => {
+      start += 1;
+      setScoreVal(start);
+      if (start >= target) clearInterval(interval);
+    }, 80);
+
+    return () => clearInterval(interval);
+  }, [inView]);
+
+  // Ascending Data Trajectories Live Canvas Background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Graph trajectory lines & statistical particles
+    const trajectoryLines = [
+      { startX: width * 0.1, startY: height * 0.8, endX: width * 0.4, endY: height * 0.3, progress: 0 },
+      { startX: width * 0.35, startY: height * 0.85, endX: width * 0.75, endY: height * 0.25, progress: 0.3 },
+      { startX: width * 0.6, startY: height * 0.75, endX: width * 0.9, endY: height * 0.2, progress: 0.6 },
+    ];
+
+    const dataPoints = Array.from({ length: 15 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vy: - (Math.random() * 0.4 + 0.2),
+      alpha: Math.random() * 0.35 + 0.15,
+      radius: Math.random() * 2 + 1,
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // Faint Ascending Grid Lines
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.03)";
+      ctx.lineWidth = 1;
+      const step = 65;
+      for (let x = 0; x < width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      if (!prefersReducedMotion) {
+        // Ascending Trajectory Lines
+        trajectoryLines.forEach((line) => {
+          line.progress += 0.004;
+          if (line.progress > 1) line.progress = 0;
+
+          ctx.beginPath();
+          ctx.moveTo(line.startX, line.startY);
+          ctx.lineTo(line.endX, line.endY);
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+          ctx.setLineDash([4, 6]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Traveling pulse on trajectory
+          const px = line.startX + (line.endX - line.startX) * line.progress;
+          const py = line.startY + (line.endY - line.startY) * line.progress;
+          ctx.beginPath();
+          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.fillStyle = "#f0c94b";
+          ctx.shadowColor = "#f0c94b";
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+
+        // Rising statistical points
+        dataPoints.forEach((p) => {
+          p.y += p.vy;
+          if (p.y < 0) p.y = height;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(240, 201, 75, ${p.alpha})`;
+          ctx.fill();
+        });
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   const metrics = [
     { label: "Overall Score Index", val: 60, target: 74, color: "var(--color-gold-bright)", leak: false },
     { label: "Focus Endurance", val: 38, target: 75, color: "var(--color-status-red)", leak: true },
@@ -22,16 +166,34 @@ export default function IllustrativeAuditSection() {
     "Reset engine for missed daily targets",
   ];
 
+  const AUDIT_URL = "https://cnm-online-audit.vercel.app/";
+
   return (
     <section
       id="illustrative-audit"
+      ref={sectionRef}
       style={{
         padding: "5.5rem 0",
-        backgroundColor: "var(--color-background-alt)",
+        backgroundColor: "#060608",
         borderBottom: "1px solid var(--color-border-subtle)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div className="container">
+      {/* Ascending Data Trajectories Live Canvas Background */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <SectionHeading
           eyebrow="CASE STUDY ARCHITECTURE"
           title="Illustrative Student Performance Audit"
@@ -51,19 +213,26 @@ export default function IllustrativeAuditSection() {
             fontSize: "0.78rem",
             color: "var(--color-gold-bright)",
             fontWeight: 600,
+            opacity: inView ? 1 : 0,
+            transition: "opacity 0.6s ease",
           }}
         >
-          NOTE: Illustrative example based on real diagnostic data models — actual results vary by student, starting point, and daily execution.
+          NOTE: Illustrative example based on real diagnostic data models - actual results vary by student, starting point, and daily execution.
         </div>
 
-        {/* Main Case Study UI Card */}
+        {/* Main Case Study UI Card (Stationary Parent Wrapper) */}
         <div
           style={{
-            backgroundColor: "var(--color-surface)",
+            backgroundColor: "rgba(14, 14, 18, 0.95)",
             border: "1px solid var(--color-border-gold)",
             borderRadius: "var(--radius-lg)",
             padding: "2.5rem",
+            backdropFilter: "blur(10px)",
             boxShadow: "0 20px 50px rgba(0, 0, 0, 0.8)",
+            transition: "opacity 0.6s ease, filter 0.6s ease",
+            opacity: inView ? 1 : 0,
+            filter: inView ? "blur(0px)" : "blur(8px)",
+            transform: "none", // Parent container remains completely stationary
           }}
         >
           <div
@@ -74,8 +243,15 @@ export default function IllustrativeAuditSection() {
             }}
             className="audit-grid"
           >
-            {/* Left: Starting Metrics Telemetry */}
-            <div>
+            {/* Left: Starting Metrics Telemetry (Card 1 - Stagger Entrance 0ms) */}
+            <div
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(16px)",
+                transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                transitionDelay: "100ms",
+              }}
+            >
               <div
                 style={{
                   fontSize: "0.72rem",
@@ -128,9 +304,10 @@ export default function IllustrativeAuditSection() {
                       <div
                         style={{
                           height: "100%",
-                          width: `${m.val}%`,
+                          width: inView ? `${m.val}%` : "0%",
                           backgroundColor: m.color,
                           borderRadius: "4px",
+                          transition: "width 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
                         }}
                       />
                     </div>
@@ -140,14 +317,22 @@ export default function IllustrativeAuditSection() {
             </div>
 
             {/* Right: Diagnosis, Intervention & Score Trajectory */}
-            <div style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between", gap: "1.5rem" }}>
-              {/* Primary Diagnosis Box */}
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
+              {/* Primary Diagnosis Box (Card 2 - Hover Scale & Stagger Entrance 220ms) */}
               <div
+                onMouseEnter={() => setHoveredCard(0)}
+                onMouseLeave={() => setHoveredCard(null)}
                 style={{
-                  backgroundColor: "rgba(10, 10, 12, 0.8)",
-                  border: "1px solid var(--color-status-red)",
+                  backgroundColor: hoveredCard === 0 ? "rgba(18, 10, 12, 0.95)" : "rgba(10, 10, 12, 0.8)",
+                  border: hoveredCard === 0 ? "1px solid var(--color-status-red)" : "1px solid rgba(239, 68, 68, 0.4)",
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
+                  transform: inView ? (hoveredCard === 0 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
+                  opacity: inView ? 1 : 0,
+                  boxShadow: hoveredCard === 0 ? "0 10px 30px rgba(239, 68, 68, 0.22)" : "none",
+                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+                  transitionDelay: inView ? "220ms" : "0ms",
+                  cursor: "pointer",
                 }}
               >
                 <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-status-red)" }}>
@@ -161,13 +346,21 @@ export default function IllustrativeAuditSection() {
                 </p>
               </div>
 
-              {/* Intervention Protocol List */}
+              {/* Intervention Protocol List (Card 3 - Hover Scale & Stagger Entrance 340ms) */}
               <div
+                onMouseEnter={() => setHoveredCard(1)}
+                onMouseLeave={() => setHoveredCard(null)}
                 style={{
-                  backgroundColor: "rgba(10, 10, 12, 0.8)",
-                  border: "1px solid var(--color-border-gold)",
+                  backgroundColor: hoveredCard === 1 ? "rgba(22, 20, 14, 0.95)" : "rgba(10, 10, 12, 0.8)",
+                  border: hoveredCard === 1 ? "1px solid var(--color-gold-bright)" : "1px solid var(--color-border-gold)",
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
+                  transform: inView ? (hoveredCard === 1 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
+                  opacity: inView ? 1 : 0,
+                  boxShadow: hoveredCard === 1 ? "0 10px 30px rgba(240, 201, 75, 0.22)" : "none",
+                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+                  transitionDelay: inView ? "340ms" : "0ms",
+                  cursor: "pointer",
                 }}
               >
                 <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-gold-bright)" }}>
@@ -192,16 +385,24 @@ export default function IllustrativeAuditSection() {
                 </ul>
               </div>
 
-              {/* Score Trajectory Summary */}
+              {/* Score Trajectory Summary with Count-up (Card 4 - Hover Scale & Stagger Entrance 460ms) */}
               <div
+                onMouseEnter={() => setHoveredCard(2)}
+                onMouseLeave={() => setHoveredCard(null)}
                 style={{
-                  backgroundColor: "var(--color-surface-gold)",
-                  border: "1px solid var(--color-border-gold-bright)",
+                  backgroundColor: hoveredCard === 2 ? "rgba(240, 201, 75, 0.15)" : "rgba(240, 201, 75, 0.08)",
+                  border: "1px solid var(--color-gold-bright)",
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  transform: inView ? (hoveredCard === 2 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
+                  opacity: inView ? 1 : 0,
+                  boxShadow: hoveredCard === 2 ? "0 10px 30px rgba(240, 201, 75, 0.3)" : "none",
+                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background-color 0.3s ease, box-shadow 0.3s ease",
+                  transitionDelay: inView ? "460ms" : "0ms",
+                  cursor: "pointer",
                 }}
               >
                 <div>
@@ -209,7 +410,7 @@ export default function IllustrativeAuditSection() {
                     SCORE TRANSFORMATION POTENTIAL
                   </div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", marginTop: "4px" }}>
-                    <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "#ffffff" }}>CURRENT: 60</span>
+                    <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "#ffffff" }}>CURRENT: {scoreVal}</span>
                     <span style={{ fontSize: "1.2rem", color: "var(--color-gold-bright)" }}>➔</span>
                     <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--color-gold-bright)" }}>TARGET: 74</span>
                   </div>
@@ -233,9 +434,28 @@ export default function IllustrativeAuditSection() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
-          <Button href="#audit" variant="primary" style={{ padding: "0.85rem 1.75rem" }}>
+          <a
+            href={AUDIT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              padding: "0.85rem 1.75rem",
+              borderRadius: "var(--radius-md)",
+              textDecoration: "none",
+              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
+              transition: "all 0.2s ease",
+            }}
+          >
             RUN YOUR PERSONAL PERFORMANCE AUDIT →
-          </Button>
+          </a>
         </div>
       </div>
 
@@ -249,3 +469,4 @@ export default function IllustrativeAuditSection() {
     </section>
   );
 }
+

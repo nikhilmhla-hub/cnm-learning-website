@@ -68,7 +68,7 @@ export default function DreamSection() {
           <div className="dream-left">
             <SectionHeading
               eyebrow="ACHIEVE YOUR IIT DREAM"
-              title="Your IIT Seat is a Journey — CNM Helps You Walk Every Step"
+              title="Your IIT Seat is a Journey - CNM Helps You Walk Every Step"
               description="Getting into IIT isn't luck. It's preparation, strategy, and the right visual tools to make complex concepts unforgettable. That's what CNM Learning is built for."
             />
             <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>

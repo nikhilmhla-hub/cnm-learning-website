@@ -103,13 +103,27 @@ export default function Navbar() {
 
         {/* Desktop Header CTA */}
         <div className="desktop-cta" style={{ flexShrink: 0 }}>
-          <Button
-            href="#audit"
-            variant="primary"
-            style={{ padding: "0.55rem 1.15rem", fontSize: "0.82rem" }}
+          <a
+            href="https://cnm-online-audit.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              padding: "0.55rem 1.15rem",
+              borderRadius: "var(--radius-sm)",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              boxShadow: "0 2px 10px rgba(212, 175, 55, 0.3)",
+              transition: "all 0.2s ease",
+            }}
           >
             Run Performance Audit →
-          </Button>
+          </a>
         </div>
 
         {/* Mobile Hamburger Toggle Button */}
@@ -186,14 +200,27 @@ export default function Navbar() {
               {item.label}
             </a>
           ))}
-          <Button
-            href="#audit"
-            variant="primary"
+          <a
+            href="https://cnm-online-audit.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setMobileMenuOpen(false)}
-            style={{ width: "100%", marginTop: "0.5rem", padding: "0.85rem 1rem" }}
+            style={{
+              width: "100%",
+              marginTop: "0.5rem",
+              padding: "0.85rem 1rem",
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              borderRadius: "var(--radius-sm)",
+              textAlign: "center",
+              textDecoration: "none",
+              display: "block",
+            }}
           >
             Run Performance Audit →
-          </Button>
+          </a>
         </div>
       )}
 

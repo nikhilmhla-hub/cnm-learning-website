@@ -52,7 +52,7 @@ export default function ExperienceSection() {
     },
     {
       before: "Memorising formulas without understanding",
-      after: "Visualising WHY formulas work — instantly",
+      after: "Visualising WHY formulas work - instantly",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9 18h6" />
@@ -95,7 +95,7 @@ export default function ExperienceSection() {
           <SectionHeading
             eyebrow="THE CNM TRANSFORMATION"
             title="This Is What Changes When You Learn with CNM"
-            description="Students don't just learn differently with CNM — they think differently. Here's the shift that happens once you switch to visual-first learning."
+            description="Students don't just learn differently with CNM - they think differently. Here's the shift that happens once you switch to visual-first learning."
             centered
             className="exp-heading"
           />
@@ -243,7 +243,7 @@ export default function ExperienceSection() {
               margin: 0,
             }}
           >
-            CNM Learning doesn't just prepare you for JEE — it rewires how you understand
+            CNM Learning doesn't just prepare you for JEE - it rewires how you understand
             Physics, Chemistry, and Mathematics forever.
           </p>
         </div>

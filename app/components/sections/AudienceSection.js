@@ -52,7 +52,7 @@ export default function AudienceSection() {
     {
       badge: "Class 11 & 12",
       title: "JEE Aspirants",
-      desc: "Master Physics, Chemistry & Maths with 3D visual learning engineered for IIT-JEE — from fundamentals to the most advanced problems.",
+      desc: "Master Physics, Chemistry & Maths with 3D visual learning engineered for IIT-JEE - from fundamentals to the most advanced problems.",
     },
     {
       badge: "Droppers",
@@ -85,7 +85,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Track Your Child's Progress",
-      desc: "Real-time performance reports, weekly assessments, and concept mastery tracking — so you always know where your child stands.",
+      desc: "Real-time performance reports, weekly assessments, and concept mastery tracking - so you always know where your child stands.",
     },
     {
       icon: (
@@ -96,7 +96,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Mentored, Not Just Taught",
-      desc: "Weekly personal mentoring sessions ensure your child doesn't just consume content — they're guided, motivated, and strategically coached.",
+      desc: "Weekly personal mentoring sessions ensure your child doesn't just consume content - they're guided, motivated, and strategically coached.",
     },
     {
       icon: (
@@ -105,7 +105,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Proven Visual Methodology",
-      desc: "CNM's 3D animated approach is engineered to make complex JEE concepts truly stick — giving your child a lasting conceptual edge over rote learners.",
+      desc: "CNM's 3D animated approach is engineered to make complex JEE concepts truly stick - giving your child a lasting conceptual edge over rote learners.",
     },
     {
       icon: (
@@ -127,7 +127,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Upgrade Your Teaching Arsenal",
-      desc: "Integrate CNM's 3D animated content library into your classroom — immediately elevating the quality of instruction without replacing your faculty.",
+      desc: "Integrate CNM's 3D animated content library into your classroom - immediately elevating the quality of instruction without replacing your faculty.",
     },
     {
       icon: (
@@ -138,7 +138,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Kiosk & Digital Classroom Ready",
-      desc: "CNM's content is designed for large-screen kiosk deployment and interactive classroom boards — plug-and-play visual learning at scale.",
+      desc: "CNM's content is designed for large-screen kiosk deployment and interactive classroom boards - plug-and-play visual learning at scale.",
     },
     {
       icon: (
@@ -149,7 +149,7 @@ export default function AudienceSection() {
         </svg>
       ),
       title: "Student Performance Dashboard",
-      desc: "Institute-level analytics — monitor batch performance, identify struggling students early, and make data-driven teaching decisions.",
+      desc: "Institute-level analytics - monitor batch performance, identify struggling students early, and make data-driven teaching decisions.",
     },
     {
       icon: (
@@ -174,7 +174,7 @@ export default function AudienceSection() {
         <SectionHeading
           eyebrow="WHO IS CNM LEARNING FOR?"
           title="Built for Every Stage of the JEE Journey"
-          description="Whether you're a student, a parent seeking clarity, or an institution ready to transform — CNM Learning is designed for you."
+          description="Whether you're a student, a parent seeking clarity, or an institution ready to transform - CNM Learning is designed for you."
           centered
           className="audience-header"
         />

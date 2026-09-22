@@ -7,7 +7,7 @@ export const faqData = [
   {
     id: 2,
     question: "Are your lessons suitable for beginners or students who are behind in their syllabus?",
-    answer: "Yes. Go visual — even a beginner gets it instantly. Lessons start from core intuitive visual breakdowns before advancing to JEE Advanced difficulty.",
+    answer: "Yes. Go visual - even a beginner gets it instantly. Lessons start from core intuitive visual breakdowns before advancing to JEE Advanced difficulty.",
   },
   {
     id: 3,

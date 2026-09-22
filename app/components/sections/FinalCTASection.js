@@ -71,7 +71,7 @@ export default function FinalCTASection() {
               lineHeight: 1.6,
             }}
           >
-            Find exactly where your preparation is leaking marks — focus, accuracy, revision, time, or exam pressure — and convert those findings into a measurable 90-day plan.
+            Find exactly where your preparation is leaking marks - focus, accuracy, revision, time, or exam pressure - and convert those findings into a measurable 90-day plan.
           </p>
 
           <div
@@ -82,9 +82,28 @@ export default function FinalCTASection() {
               gap: "1.25rem",
             }}
           >
-            <Button href="#audit" variant="primary" style={{ padding: "0.95rem 2.25rem", fontSize: "1rem" }}>
+            <a
+              href="https://cnm-online-audit.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                backgroundColor: "var(--color-gold-bright)",
+                color: "#050505",
+                fontWeight: 800,
+                fontSize: "1rem",
+                padding: "0.95rem 2.25rem",
+                borderRadius: "var(--radius-md)",
+                textDecoration: "none",
+                boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
+                transition: "all 0.2s ease",
+              }}
+            >
               RUN YOUR CNM PERFORMANCE AUDIT →
-            </Button>
+            </a>
             <Button href="#how-it-works" variant="secondary" style={{ padding: "0.95rem 1.75rem", fontSize: "1rem" }}>
               EXPLORE CNM SYSTEM LABS
             </Button>

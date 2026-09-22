@@ -1,5 +1,5 @@
 export default function VideoPlaceholder({
-  title = "CNM Learning — Sample Lesson",
+  title = "CNM Learning - Sample Lesson",
   aspectRatio = "16/9",
   className = "",
 }) {

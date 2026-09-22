@@ -1,78 +1,270 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
-import Button from "../ui/Button";
 
 export default function ProblemLeaksSection() {
+  const [resolved, setResolved] = useState(false);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [inView, setInView] = useState(false);
+  const [visibleCardCount, setVisibleCardCount] = useState(0);
+
+  const sectionRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // Scroll Trigger via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Sequential card arrival stagger when section enters view
+  useEffect(() => {
+    if (!inView) return;
+
+    let count = 0;
+    const interval = setInterval(() => {
+      count += 1;
+      setVisibleCardCount(count);
+      if (count >= 5) {
+        clearInterval(interval);
+        setTimeout(() => setResolved(true), 400);
+      }
+    }, 180);
+
+    return () => clearInterval(interval);
+  }, [inView]);
+
+  // Live Performance Data Field Canvas Background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Canvas elements for Performance Data Field
+    const signalLines = Array.from({ length: 6 }, (_, i) => ({
+      y: (height / 7) * (i + 1),
+      speed: 0.4 + Math.random() * 0.5,
+      amplitude: 12 + Math.random() * 20,
+      wavelength: 0.008 + Math.random() * 0.005,
+      offset: Math.random() * Math.PI * 2,
+    }));
+
+    const dataPoints = Array.from({ length: 18 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: Math.random() * 2 + 1,
+      alpha: Math.random() * 0.4 + 0.2,
+    }));
+
+    const radarArcs = [
+      { x: width * 0.2, y: height * 0.5, r: 80, speed: 0.008, angle: 0 },
+      { x: width * 0.8, y: height * 0.5, r: 110, speed: -0.006, angle: Math.PI },
+    ];
+
+    let pulseProgress = 0;
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Grid Intersections & Horizontal Lines
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.035)";
+      ctx.lineWidth = 1;
+      const gridStep = 60;
+      for (let x = 0; x < width; x += gridStep) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridStep) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      if (!prefersReducedMotion) {
+        // 2. Waveform Signal Paths
+        pulseProgress += 0.015;
+        signalLines.forEach((line) => {
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+          ctx.lineWidth = 1.5;
+          for (let x = 0; x < width; x += 10) {
+            const y = line.y + Math.sin(x * line.wavelength + line.offset + pulseProgress * line.speed) * line.amplitude;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        });
+
+        // 3. Floating Data Points
+        dataPoints.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(240, 201, 75, ${p.alpha})`;
+          ctx.fill();
+        });
+
+        // 4. Radar Arcs
+        radarArcs.forEach((arc) => {
+          arc.angle += arc.speed;
+          ctx.beginPath();
+          ctx.arc(arc.x, arc.y, arc.r, arc.angle, arc.angle + Math.PI * 0.6);
+          ctx.strokeStyle = "rgba(212, 175, 55, 0.06)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        });
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   const leaks = [
     {
       title: "FOCUS",
-      tagline: "Can't stay locked into deep work.",
-      detail: "Attention collapses after 20 minutes, leading to superficial reading without deep retention.",
-      indicator: "ATTENTION LEAK",
+      explanation: "Your ability to sustain deep work.",
+      metric: "38%",
+      badge: "NEEDS ATTENTION",
       statusColor: "var(--color-status-amber)",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f0c94b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-target">
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="6" />
+          <circle cx="12" cy="12" r="2" fill="#f0c94b" />
+        </svg>
+      ),
     },
     {
       title: "ACCURACY",
-      tagline: "Knows the answer but loses marks through mistakes.",
-      detail: "Careless calculation errors, misread options, and formula confusion drain 15-30 marks per test.",
-      indicator: "ACCURACY LEAK",
+      explanation: "Precision without unforced errors.",
+      metric: "50%",
+      badge: "CRITICAL LEAK",
       statusColor: "var(--color-status-red)",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-precision">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="6" x2="12" y2="18" />
+          <line x1="6" y1="12" x2="18" y2="12" />
+        </svg>
+      ),
     },
     {
       title: "REVISION",
-      tagline: "Studies chapters but doesn't retain them.",
-      detail: "Without structured active recall, 60% of covered material decays within 14 days.",
-      indicator: "RETENTION LEAK",
-      statusColor: "var(--color-status-amber)",
-    },
-    {
-      title: "MOCK TESTS",
-      tagline: "Takes tests but doesn't learn from them.",
-      detail: "Treating tests as mere scoreboards rather than diagnostic tools leaves recurring mistakes unfixed.",
-      indicator: "ANALYSIS LEAK",
-      statusColor: "var(--color-status-red)",
+      explanation: "Retention over 14-day recall intervals.",
+      metric: "78%",
+      badge: "RETENTION OK",
+      statusColor: "var(--color-status-green)",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-refresh">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      ),
     },
     {
       title: "TIME",
-      tagline: "Runs out of time or spends too long on questions.",
-      detail: "Poor question selection and sunk-cost fallacies lead to unattempted high-yield questions.",
-      indicator: "PACING LEAK",
+      explanation: "Pacing & question selection speed.",
+      metric: "68%",
+      badge: "PACING LEAK",
       statusColor: "var(--color-status-amber)",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-clock">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
     },
     {
       title: "CONFIDENCE",
-      tagline: "Performance collapses under pressure.",
-      detail: "Exam anxiety causes mental blocks, second-guessing correct answers, and erratic speed.",
-      indicator: "PRESSURE LEAK",
+      explanation: "Stability under high exam pressure.",
+      metric: "68%",
+      badge: "PRESSURE RISK",
       statusColor: "var(--color-status-red)",
-    },
-    {
-      title: "EXECUTION",
-      tagline: "Creates plans but doesn't consistently follow them.",
-      detail: "Ambiguous daily goals lead to decision fatigue, task switching, and abandoned timetables.",
-      indicator: "CONSISTENCY LEAK",
-      statusColor: "var(--color-status-amber)",
-    },
-    {
-      title: "RANK",
-      tagline: "Works hard without knowing what is moving the rank.",
-      detail: "High study volume without feedback loops leads to stagnant scores despite massive effort.",
-      indicator: "DIRECTION LEAK",
-      statusColor: "var(--color-status-amber)",
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-signal">
+          <path d="M18 20V10" />
+          <path d="M12 20V4" />
+          <path d="M6 20v-6" />
+        </svg>
+      ),
     },
   ];
+
+  const AUDIT_URL = "https://cnm-online-audit.vercel.app/";
 
   return (
     <section
       id="problem-leaks"
+      ref={sectionRef}
       style={{
-        padding: "5rem 0",
-        backgroundColor: "var(--color-background-alt)",
+        padding: "5.5rem 0",
+        backgroundColor: "#070709",
         borderBottom: "1px solid var(--color-border-subtle)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div className="container">
+      {/* Performance Data Field Live Background */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         {/* Section Heading */}
         <SectionHeading
           eyebrow="PERFORMANCE DIAGNOSTICS"
@@ -81,128 +273,311 @@ export default function ProblemLeaksSection() {
           center={true}
         />
 
-        {/* 8 Horizontal Problem Grid */}
+        {/* Faint Connecting Network Signal Rail behind cards */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "1.25rem",
-            marginTop: "3rem",
+            position: "relative",
+            marginTop: "3.5rem",
           }}
         >
-          {leaks.map((leak, idx) => (
+          {/* Background Signal Rail with Traveling Data Pulse */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "2%",
+              right: "2%",
+              height: "2px",
+              background: "linear-gradient(90deg, rgba(212, 175, 55, 0.08), rgba(56, 189, 248, 0.25), rgba(212, 175, 55, 0.08))",
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          >
+            {/* Active Traveling Pulse */}
             <div
-              key={leak.title}
+              className="signal-rail-pulse"
               style={{
-                backgroundColor: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                gap: "1rem",
-                transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-                position: "relative",
+                position: "absolute",
+                top: "-3px",
+                width: "40px",
+                height: "8px",
+                borderRadius: "4px",
+                background: "linear-gradient(90deg, transparent, #f0c94b, transparent)",
+                boxShadow: "0 0 10px #f0c94b",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--color-border-gold)";
-                e.currentTarget.style.transform = "translateY(-3px)";
-                e.currentTarget.style.backgroundColor = "var(--color-surface-hover)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--color-border)";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.backgroundColor = "var(--color-surface)";
-              }}
-            >
-              <div>
-                {/* Header Strip with Indicator */}
+            />
+          </div>
+
+          {/* 5 Diagnostic Sensor Cards - One-by-One Staggered Entrance */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "1.25rem",
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            {leaks.map((leak, idx) => {
+              const isVisible = visibleCardCount > idx;
+              const isHovered = hoveredIdx === idx;
+              const isFromLeft = idx % 2 === 0;
+
+              return (
                 <div
+                  key={leak.title}
+                  onMouseEnter={() => setHoveredIdx(idx)}
+                  onMouseLeave={() => setHoveredIdx(null)}
                   style={{
+                    backgroundColor: isHovered ? "rgba(20, 20, 25, 0.98)" : "rgba(12, 12, 15, 0.92)",
+                    border: isHovered ? `2px solid ${leak.statusColor}` : "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "1.5rem",
                     display: "flex",
-                    alignItems: "center",
+                    flexDirection: "column",
                     justifyContent: "space-between",
-                    marginBottom: "0.85rem",
+                    gap: "1rem",
+                    backdropFilter: "blur(8px)",
+                    transition:
+                      "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+                    opacity: isVisible ? 1 : 0,
+                    filter: isVisible ? "blur(0px)" : "blur(8px)",
+                    transform: isVisible
+                      ? isHovered
+                        ? "translate(0, -6px) scale(1.02)"
+                        : "translate(0, 0) scale(1)"
+                      : isFromLeft
+                      ? "translate(-30px, 15px) scale(0.96)"
+                      : "translate(30px, 15px) scale(0.96)",
+                    boxShadow: isHovered
+                      ? `0 12px 30px rgba(0, 0, 0, 0.8), 0 0 20px ${leak.statusColor}30`
+                      : "0 4px 15px rgba(0, 0, 0, 0.5)",
+                    position: "relative",
+                    overflow: "hidden",
                   }}
                 >
-                  <span
+                  {/* Top Scan Line Highlight on Hover */}
+                  {isHovered && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: "3px",
+                        backgroundColor: leak.statusColor,
+                        boxShadow: `0 0 10px ${leak.statusColor}`,
+                      }}
+                    />
+                  )}
+
+                  <div>
+                    {/* Header Label & Icon */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.7rem",
+                          fontWeight: 800,
+                          letterSpacing: "0.1em",
+                          color: "var(--color-gold-bright)",
+                        }}
+                      >
+                        SENSOR 0{idx + 1}
+                      </span>
+
+                      <div
+                        style={{
+                          width: "44px",
+                          height: "44px",
+                          borderRadius: "10px",
+                          backgroundColor: "rgba(255, 255, 255, 0.04)",
+                          border: "1px solid var(--color-border-subtle)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {leak.icon}
+                      </div>
+                    </div>
+
+                    {/* Metric Name & Explanation */}
+                    <h3
+                      style={{
+                        fontSize: "1.15rem",
+                        fontWeight: 800,
+                        color: "#ffffff",
+                        marginBottom: "0.3rem",
+                      }}
+                    >
+                      {leak.title}
+                    </h3>
+
+                    <p
+                      style={{
+                        fontSize: "0.82rem",
+                        color: "var(--color-text-secondary)",
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {leak.explanation}
+                    </p>
+                  </div>
+
+                  {/* Metric Value & Sensor Badge */}
+                  <div
                     style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 800,
-                      letterSpacing: "0.1em",
-                      color: "var(--color-gold-bright)",
+                      paddingTop: "0.85rem",
+                      borderTop: "1px solid var(--color-border-subtle)",
+                      display: "flex",
+                      alignItems: "baseline",
+                      justifyContent: "space-between",
                     }}
                   >
-                    0{idx + 1} • {leak.title}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.08em",
-                      padding: "0.15rem 0.5rem",
-                      borderRadius: "4px",
-                      backgroundColor: "rgba(255, 255, 255, 0.03)",
-                      border: `1px solid ${leak.statusColor}`,
-                      color: leak.statusColor,
-                    }}
-                  >
-                    {leak.indicator}
-                  </span>
+                    <span
+                      style={{
+                        fontSize: "1.4rem",
+                        fontWeight: 800,
+                        color: isVisible && resolved ? leak.statusColor : "var(--color-text-muted)",
+                        transition: "color 0.4s ease",
+                      }}
+                    >
+                      {isVisible && resolved ? leak.metric : "--"}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.65rem",
+                        fontWeight: 800,
+                        color: leak.statusColor,
+                        backgroundColor: `${leak.statusColor}15`,
+                        padding: "0.2rem 0.45rem",
+                        borderRadius: "4px",
+                        border: `1px solid ${leak.statusColor}40`,
+                        opacity: isVisible ? 1 : 0.4,
+                        transition: "opacity 0.4s ease",
+                      }}
+                    >
+                      {leak.badge}
+                    </span>
+                  </div>
                 </div>
-
-                {/* Card Title & Tagline */}
-                <h3
-                  style={{
-                    fontSize: "1.15rem",
-                    fontWeight: 700,
-                    color: "#ffffff",
-                    marginBottom: "0.5rem",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {leak.tagline}
-                </h3>
-
-                {/* Detail */}
-                <p
-                  style={{
-                    fontSize: "0.88rem",
-                    color: "var(--color-text-secondary)",
-                    lineHeight: 1.55,
-                  }}
-                >
-                  {leak.detail}
-                </p>
-              </div>
-
-              {/* Bottom Diagnostic Bar Indicator */}
-              <div
-                style={{
-                  paddingTop: "0.75rem",
-                  borderTop: "1px solid var(--color-border-subtle)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  fontSize: "0.72rem",
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                <span>Diagnostic Status:</span>
-                <span style={{ color: leak.statusColor, fontWeight: 700 }}>Measurable & Fixable</span>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Section Action CTA */}
+        {/* Audit CTA */}
         <div style={{ textAlign: "center", marginTop: "3rem" }}>
-          <Button href="#audit" variant="primary" style={{ padding: "0.85rem 1.75rem" }}>
+          <a
+            href={AUDIT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              padding: "0.85rem 1.75rem",
+              borderRadius: "var(--radius-md)",
+              textDecoration: "none",
+              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
+              transition: "all 0.2s ease",
+            }}
+          >
             IDENTIFY MY BIGGEST PERFORMANCE LEAK →
-          </Button>
+          </a>
         </div>
       </div>
+
+      <style jsx>{`
+        .signal-rail-pulse {
+          animation: pulseTravel 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseTravel {
+          0% {
+            left: 0%;
+            opacity: 0.2;
+          }
+          50% {
+            left: 95%;
+            opacity: 1;
+          }
+          100% {
+            left: 0%;
+            opacity: 0.2;
+          }
+        }
+
+        :global(.icon-target) {
+          animation: pulseTarget 3s ease-in-out infinite alternate;
+        }
+        :global(.icon-precision) {
+          animation: spinPrecision 10s linear infinite;
+        }
+        :global(.icon-refresh) {
+          animation: rotateRefresh 6s linear infinite;
+        }
+        :global(.icon-clock) {
+          animation: pulseClock 2s ease-in-out infinite alternate;
+        }
+        :global(.icon-signal) {
+          animation: bounceSignal 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseTarget {
+          0% {
+            transform: scale(0.95);
+          }
+          100% {
+            transform: scale(1.08);
+          }
+        }
+        @keyframes spinPrecision {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes rotateRefresh {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes pulseClock {
+          0% {
+            opacity: 0.7;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        @keyframes bounceSignal {
+          0% {
+            transform: translateY(0);
+          }
+          100% {
+            transform: translateY(-3px);
+          }
+        }
+      `}</style>
     </section>
   );
 }
+

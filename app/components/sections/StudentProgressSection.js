@@ -90,7 +90,7 @@ export default function StudentProgressSection() {
     },
   ];
 
-  /* Mini dashboard panel rows — structural labels only, zero fake data */
+  /* Mini dashboard panel rows - structural labels only, zero fake data */
   const panelRows = [
     { title: "Today's Focus", tag: "Active", tagGold: true },
     { title: "Study Plan", tag: "Organised", tagGold: false },
@@ -320,7 +320,7 @@ export default function StudentProgressSection() {
                   lineHeight: 1.5,
                 }}
               >
-                Illustrative layout — your dashboard reflects your actual preparation.
+                Illustrative layout - your dashboard reflects your actual preparation.
               </p>
             </div>
           </div>

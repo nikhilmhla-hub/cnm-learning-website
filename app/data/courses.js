@@ -1,7 +1,7 @@
 export const coursesData = [
   {
     id: "jee-11th",
-    title: "Visual JEE Foundation — Class 11 PCM",
+    title: "Visual JEE Foundation - Class 11 PCM",
     target: "Class 11 Aspirants",
     price: "₹29,999/-",
     originalPrice: "[Original list price]",
@@ -16,7 +16,7 @@ export const coursesData = [
   },
   {
     id: "jee-12th",
-    title: "Visual JEE Accelerator — Class 12 PCM",
+    title: "Visual JEE Accelerator - Class 12 PCM",
     target: "Class 12 Aspirants",
     price: "₹29,999/-",
     originalPrice: "[Original list price]",
@@ -31,7 +31,7 @@ export const coursesData = [
   },
   {
     id: "jee-dropper",
-    title: "Visual JEE Rank Booster — Dropper Batch PCM",
+    title: "Visual JEE Rank Booster - Dropper Batch PCM",
     target: "Class 12 Passed / Droppers",
     price: "₹49,999/-",
     originalPrice: "[Original list price]",

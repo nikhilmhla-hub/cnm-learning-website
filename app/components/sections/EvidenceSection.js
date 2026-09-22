@@ -64,7 +64,7 @@ export default function EvidenceSection() {
             fontWeight: 600,
           }}
         >
-          NOTE: Data points represent system telemetry models and illustrative performance metrics — actual outcomes depend on starting baseline and student daily execution.
+          NOTE: Data points represent system telemetry models and illustrative performance metrics - actual outcomes depend on starting baseline and student daily execution.
         </div>
 
         {/* 3 Categories Grid */}

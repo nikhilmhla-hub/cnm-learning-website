@@ -5,39 +5,75 @@ import SectionHeading from "../ui/SectionHeading";
 
 export default function MethodologySection() {
   const [activeStage, setActiveStage] = useState(0);
-  const [hasClickedRewire, setHasClickedRewire] = useState(false);
+  const [hasUserClicked, setHasUserClicked] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hoveredCardIdx, setHoveredCardIdx] = useState(null);
   const [hoveredNodeIdx, setHoveredNodeIdx] = useState(null);
+  const [inView, setInView] = useState(false);
+  const [visibleOrbitCards, setVisibleOrbitCards] = useState(0);
 
+  const sectionRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Handle stage node selection
-  const selectStage = (idx) => {
-    if (idx === 0 && !hasClickedRewire) {
-      setHasClickedRewire(true);
+  // Scroll Trigger via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Staggered Scroll Entrance for the 5 Orbit Stage Cards (One by one: 01 -> 02 -> 03 -> 04 -> 05)
+  useEffect(() => {
+    if (!inView) return;
+
+    let count = 0;
+    const interval = setInterval(() => {
+      count += 1;
+      setVisibleOrbitCards(count);
+      if (count >= 5) clearInterval(interval);
+    }, 150); // 150ms stagger per card
+
+    return () => clearInterval(interval);
+  }, [inView]);
+
+  // Handle stage node selection: User click PERMANENTLY STOPS automatic rotation timer
+  const selectStage = (idx) => {
+    setHasUserClicked(true);
     if (idx === activeStage) return;
 
     setIsTransitioning(true);
     setTimeout(() => {
       setActiveStage(idx);
       setIsTransitioning(false);
-    }, 250);
+    }, 200);
   };
 
-  // Automatic stage rotation
+  // Automatic stage rotation BEFORE user interaction ONLY. Permanently stops upon user click.
   useEffect(() => {
+    if (hasUserClicked) return; // Permanently disabled once user clicks any stage card
+
     const timer = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
         setActiveStage((prev) => (prev + 1) % 5);
         setIsTransitioning(false);
-      }, 250);
+      }, 200);
     }, 6000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [hasUserClicked]);
 
   // Circular System Loop Orbital Canvas
   useEffect(() => {
@@ -139,7 +175,7 @@ export default function MethodologySection() {
       angle: 270, // Top (12 o'clock)
       color: "#f0c94b",
       icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f0c94b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f0c94b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="3" />
           <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
         </svg>
@@ -156,7 +192,7 @@ export default function MethodologySection() {
       angle: 342, // Top Right (~2 o'clock)
       color: "#38bdf8",
       icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
           <polyline points="2 17 12 22 22 17" />
           <polyline points="2 12 12 17 22 12" />
@@ -174,7 +210,7 @@ export default function MethodologySection() {
       angle: 54, // Bottom Right (~4 o'clock)
       color: "#f43f5e",
       icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <circle cx="12" cy="12" r="6" />
           <line x1="12" y1="2" x2="12" y2="22" />
@@ -193,7 +229,7 @@ export default function MethodologySection() {
       angle: 126, // Bottom Left (~8 o'clock)
       color: "#a855f7",
       icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
         </svg>
@@ -210,7 +246,7 @@ export default function MethodologySection() {
       angle: 198, // Top Left (~10 o'clock)
       color: "#22c55e",
       icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
           <polyline points="17 6 23 6 23 12" />
         </svg>
@@ -221,6 +257,7 @@ export default function MethodologySection() {
   return (
     <section
       id="how-it-works"
+      ref={sectionRef}
       style={{
         padding: "5.5rem 0",
         backgroundColor: "#060608",
@@ -250,7 +287,7 @@ export default function MethodologySection() {
           center={true}
         />
 
-        {/* TWO-COLUMN METHODOLOGY LAYOUT SYSTEM (Desktop 2-Col, Mobile Stacked) */}
+        {/* TWO-COLUMN METHODOLOGY LAYOUT SYSTEM */}
         <div
           style={{
             marginTop: "3.5rem",
@@ -261,14 +298,14 @@ export default function MethodologySection() {
           }}
           className="methodology-two-column-grid"
         >
-          {/* LEFT COLUMN: LARGE SYSTEM ORBIT CYCLE WITH SUBSTANTIALLY LARGER STAGE CARDS */}
+          {/* LEFT COLUMN: SYSTEM ORBIT CYCLE WITH COMPACT ELEGANT STAGE CARDS */}
           <div
             className="orbit-system-wrapper"
             style={{
               position: "relative",
               width: "100%",
-              maxWidth: "580px",
-              height: "580px",
+              maxWidth: "560px",
+              height: "560px",
               margin: "0 auto",
               display: "flex",
               alignItems: "center",
@@ -279,14 +316,14 @@ export default function MethodologySection() {
             <svg
               width="100%"
               height="100%"
-              viewBox="0 0 580 580"
+              viewBox="0 0 560 560"
               style={{ position: "absolute", inset: 0, overflow: "visible" }}
             >
               {/* Outer Dashed Orbit Ring */}
               <circle
-                cx="290"
-                cy="290"
-                r="215"
+                cx="280"
+                cy="280"
+                r="205"
                 fill="none"
                 stroke="rgba(212, 175, 55, 0.18)"
                 strokeWidth="2"
@@ -294,9 +331,9 @@ export default function MethodologySection() {
               />
               {/* Inner Secondary Ring */}
               <circle
-                cx="290"
-                cy="290"
-                r="145"
+                cx="280"
+                cy="280"
+                r="135"
                 fill="none"
                 stroke="rgba(255, 255, 255, 0.05)"
                 strokeWidth="1"
@@ -304,29 +341,29 @@ export default function MethodologySection() {
 
               {/* Active Glowing Arc Segment */}
               <circle
-                cx="290"
-                cy="290"
-                r="215"
+                cx="280"
+                cy="280"
+                r="205"
                 fill="none"
                 stroke="url(#methodologyOrbitGrad)"
                 strokeWidth="4"
-                strokeDasharray="1351"
-                strokeDashoffset={1351 - 270.2 * (activeStage + 1)}
+                strokeDasharray="1288"
+                strokeDashoffset={1288 - 257.6 * (activeStage + 1)}
                 style={{
                   transform: "rotate(-90deg)",
-                  transformOrigin: "290px 290px",
+                  transformOrigin: "280px 280px",
                   transition: "stroke-dashoffset 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               />
 
               {/* Orbit Signal Particle */}
-              <circle cx="290" cy="75" r="5" fill="#f0c94b">
+              <circle cx="280" cy="75" r="4.5" fill="#f0c94b">
                 <animateTransform
                   attributeName="transform"
                   type="rotate"
-                  from="0 290 290"
-                  to="360 290 290"
-                  dur="16s"
+                  from="0 280 280"
+                  to="360 280 280"
+                  dur="18s"
                   repeatCount="indefinite"
                 />
               </circle>
@@ -343,8 +380,8 @@ export default function MethodologySection() {
             {/* Central Computational Core Indicator */}
             <div
               style={{
-                width: "190px",
-                height: "190px",
+                width: "180px",
+                height: "180px",
                 borderRadius: "50%",
                 backgroundColor: "rgba(14, 14, 18, 0.96)",
                 border: "2px solid var(--color-border-gold)",
@@ -353,21 +390,21 @@ export default function MethodologySection() {
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                padding: "1.25rem",
-                boxShadow: "0 0 45px rgba(212, 175, 55, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.8)",
+                padding: "1.1rem",
+                boxShadow: "0 0 45px rgba(212, 175, 55, 0.22), inset 0 0 20px rgba(0, 0, 0, 0.8)",
                 zIndex: 3,
                 transition: "all 0.4s ease",
               }}
             >
-              <span style={{ fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.15em", color: "var(--color-gold-bright)" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.15em", color: "var(--color-gold-bright)" }}>
                 CNM SYSTEM LOOP
               </span>
               <div
                 style={{
-                  fontSize: "1.35rem",
+                  fontSize: "1.25rem",
                   fontWeight: 800,
                   color: "#ffffff",
-                  marginTop: "6px",
+                  marginTop: "4px",
                   transition: "opacity 0.2s ease",
                   opacity: isTransitioning ? 0.3 : 1,
                 }}
@@ -376,31 +413,31 @@ export default function MethodologySection() {
               </div>
               <span
                 style={{
-                  fontSize: "0.68rem",
+                  fontSize: "0.65rem",
                   color: stages[activeStage].color,
                   fontWeight: 700,
-                  marginTop: "6px",
+                  marginTop: "4px",
                   display: "flex",
                   alignItems: "center",
                   gap: "4px",
                 }}
               >
-                <span>●</span> ACTIVE STAGE 0{activeStage + 1}
+                <span>●</span> {hasUserClicked ? "USER SELECTED" : `STAGE 0${activeStage + 1} ACTIVE`}
               </span>
             </div>
 
-            {/* 5 STAGE CARDS (196px x 96px - 10-15% reduced for optimal orbital balance) */}
+            {/* 5 STAGE CARDS (Compact 188px x 82px for optimal orbital proportion) */}
             {stages.map((stage, idx) => {
               const isActive = activeStage === idx;
               const isHoveredNode = hoveredNodeIdx === idx;
-              const isRewireFirstPulse = idx === 0 && !hasClickedRewire;
+              const isVisibleOnScroll = idx < visibleOrbitCards;
 
-              // Radial math around center (290, 290) with radius 215
-              const radius = 215;
+              // Radial math around center (280, 280) with radius 205
+              const radius = 205;
               const angleRad = (stage.angle * Math.PI) / 180;
-              // Card dimensions 196px x 96px -> half dimensions: 98px x 48px
-              const x = 290 + radius * Math.cos(angleRad) - 98;
-              const y = 290 + radius * Math.sin(angleRad) - 48;
+              // Compact Card dimensions 188px x 82px -> half dimensions: 94px x 41px
+              const x = 280 + radius * Math.cos(angleRad) - 94;
+              const y = 280 + radius * Math.sin(angleRad) - 41;
 
               return (
                 <button
@@ -412,9 +449,9 @@ export default function MethodologySection() {
                     position: "absolute",
                     left: `${x}px`,
                     top: `${y}px`,
-                    width: "196px",
-                    height: "96px",
-                    borderRadius: "12px",
+                    width: "188px",
+                    height: "82px",
+                    borderRadius: "10px",
                     backgroundColor: isActive
                       ? "rgba(22, 22, 28, 0.98)"
                       : isHoveredNode
@@ -422,37 +459,35 @@ export default function MethodologySection() {
                       : "rgba(12, 12, 16, 0.90)",
                     border: isActive
                       ? `2px solid ${stage.color}`
-                      : isRewireFirstPulse
-                      ? "2px solid var(--color-gold-bright)"
                       : "1px solid var(--color-border-subtle)",
                     boxShadow: isActive
-                      ? `0 0 25px ${stage.color}45, 0 8px 20px rgba(0,0,0,0.8)`
-                      : isRewireFirstPulse
-                      ? "0 0 20px rgba(240, 201, 75, 0.5)"
+                      ? `0 0 22px ${stage.color}40, 0 6px 18px rgba(0,0,0,0.8)`
                       : isHoveredNode
                       ? "0 6px 16px rgba(0, 0, 0, 0.8)"
                       : "0 4px 12px rgba(0, 0, 0, 0.6)",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.75rem",
-                    padding: "0.75rem 0.9rem",
+                    gap: "0.65rem",
+                    padding: "0.6rem 0.75rem",
                     backdropFilter: "blur(12px)",
                     transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
                     zIndex: 4,
-                    transform: isActive
-                      ? "scale(1.06)"
-                      : isHoveredNode
-                      ? "scale(1.03)"
-                      : "scale(1)",
-                    animation: isRewireFirstPulse ? "rewirePulseAttention 2.2s ease-in-out infinite" : "none",
+                    opacity: isVisibleOnScroll ? 1 : 0,
+                    transform: isVisibleOnScroll
+                      ? isActive
+                        ? "scale(1.05)"
+                        : isHoveredNode
+                        ? "scale(1.03)"
+                        : "scale(1)"
+                      : "scale(0.85) translateY(12px)",
                   }}
                 >
                   <div
                     style={{
-                      width: "38px",
-                      height: "38px",
-                      borderRadius: "8px",
+                      width: "34px",
+                      height: "34px",
+                      borderRadius: "7px",
                       backgroundColor: isActive ? `${stage.color}20` : "rgba(255, 255, 255, 0.04)",
                       border: isActive ? `1px solid ${stage.color}60` : "1px solid var(--color-border-subtle)",
                       display: "flex",
@@ -468,9 +503,9 @@ export default function MethodologySection() {
                   <div style={{ textAlign: "left" }}>
                     <div
                       style={{
-                        fontSize: "0.58rem",
+                        fontSize: "0.56rem",
                         fontWeight: 800,
-                        letterSpacing: "0.12em",
+                        letterSpacing: "0.1em",
                         color: isActive ? stage.color : "var(--color-text-muted)",
                       }}
                     >
@@ -478,7 +513,7 @@ export default function MethodologySection() {
                     </div>
                     <div
                       style={{
-                        fontSize: "0.95rem",
+                        fontSize: "0.88rem",
                         fontWeight: 800,
                         color: isActive ? "#ffffff" : "var(--color-text-secondary)",
                         marginTop: "1px",
@@ -488,13 +523,13 @@ export default function MethodologySection() {
                     </div>
                     <div
                       style={{
-                        fontSize: "0.6rem",
+                        fontSize: "0.58rem",
                         color: isActive ? stage.color : "var(--color-text-muted)",
                         fontWeight: 700,
                         marginTop: "1px",
                       }}
                     >
-                      ● {isActive ? "INSPECTING" : "CLICK TO VIEW"}
+                      ● {isActive ? "INSPECTING" : "SELECT"}
                     </div>
                   </div>
                 </button>
@@ -502,7 +537,7 @@ export default function MethodologySection() {
             })}
           </div>
 
-          {/* RIGHT COLUMN: ACTIVE STAGE DETAIL PANEL (VISIBLE BY DEFAULT ON DESKTOP) */}
+          {/* RIGHT COLUMN: ACTIVE STAGE DETAIL PANEL (STABLE CONTAINER) */}
           <div
             className="methodology-detail-panel-container"
             style={{
@@ -522,7 +557,7 @@ export default function MethodologySection() {
                 borderBottom: "1px solid var(--color-border-subtle)",
                 paddingBottom: "1.25rem",
                 marginBottom: "1.5rem",
-                transition: "opacity 0.3s ease",
+                transition: "opacity 0.25s ease",
                 opacity: isTransitioning ? 0.3 : 1,
               }}
             >
@@ -537,7 +572,7 @@ export default function MethodologySection() {
               >
                 STAGE 0{activeStage + 1} / 05 • DIAGNOSTIC INTERVENTION
               </div>
-              <h3 style={{ fontSize: "1.9rem", fontWeight: 800, color: "#ffffff" }}>
+              <h3 style={{ fontSize: "1.8rem", fontWeight: 800, color: "#ffffff" }}>
                 {stages[activeStage].name} -{" "}
                 <span style={{ color: stages[activeStage].color }}>{stages[activeStage].subtitle}</span>
               </h3>
@@ -553,7 +588,7 @@ export default function MethodologySection() {
               </p>
             </div>
 
-            {/* 4 VERTICALLY ORIENTED SUBSTANTIALLY DESIGNED DETAIL CARDS (ONE-BY-ONE STAGGERED ENTRANCE) */}
+            {/* 4 DETAIL CARDS WITH ALTERNATING ENTRANCE DIRECTIONS (Left / Right / Left / Right) */}
             <div
               style={{
                 display: "grid",
@@ -572,6 +607,7 @@ export default function MethodologySection() {
                   hoverBg: "rgba(18, 14, 16, 0.95)",
                   shadow: "0 10px 25px rgba(239, 68, 68, 0.18)",
                   iconBg: "rgba(239, 68, 68, 0.15)",
+                  direction: "from-left",
                 },
                 {
                   key: "whatCNMDoes",
@@ -583,6 +619,7 @@ export default function MethodologySection() {
                   hoverBg: "rgba(22, 20, 14, 0.95)",
                   shadow: "0 10px 25px rgba(240, 201, 75, 0.22)",
                   iconBg: "rgba(240, 201, 75, 0.15)",
+                  direction: "from-right",
                 },
                 {
                   key: "whatGetsMeasured",
@@ -594,6 +631,7 @@ export default function MethodologySection() {
                   hoverBg: "rgba(14, 18, 22, 0.95)",
                   shadow: "0 10px 25px rgba(56, 189, 248, 0.18)",
                   iconBg: "rgba(56, 189, 248, 0.15)",
+                  direction: "from-left",
                 },
                 {
                   key: "whatChanges",
@@ -605,9 +643,12 @@ export default function MethodologySection() {
                   hoverBg: "rgba(14, 20, 16, 0.95)",
                   shadow: "0 10px 25px rgba(34, 197, 94, 0.18)",
                   iconBg: "rgba(34, 197, 94, 0.15)",
+                  direction: "from-right",
                 },
               ].map((card, cIdx) => {
                 const isHovered = hoveredCardIdx === cIdx;
+                const translateXVal = card.direction === "from-left" ? "-18px" : "18px";
+
                 return (
                   <div
                     key={card.key}
@@ -622,20 +663,19 @@ export default function MethodologySection() {
                       transitionDelay: isTransitioning ? "0ms" : `${cIdx * 90}ms`,
                       opacity: isTransitioning ? 0 : 1,
                       transform: isTransitioning
-                        ? "translateY(18px)"
+                        ? `translateX(${translateXVal}) translateY(8px)`
                         : isHovered
                         ? "scale(1.03) translateY(-4px)"
-                        : "translateY(0) scale(1)",
+                        : "translateX(0) translateY(0) scale(1)",
                       filter: isTransitioning ? "blur(4px)" : "blur(0px)",
                       boxShadow: isHovered ? card.shadow : "none",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.65rem" }}>
-                      {/* Substantially larger icon visual anchor (44px) */}
                       <div
                         style={{
-                          width: "44px",
-                          height: "44px",
+                          width: "42px",
+                          height: "42px",
                           borderRadius: "10px",
                           backgroundColor: card.iconBg,
                           border: `1px solid ${card.activeBorderColor}`,
@@ -650,7 +690,7 @@ export default function MethodologySection() {
                       </div>
                       <div
                         style={{
-                          fontSize: "0.7rem",
+                          fontSize: "0.68rem",
                           fontWeight: 800,
                           letterSpacing: "0.08em",
                           color: card.tagColor,
@@ -673,18 +713,6 @@ export default function MethodologySection() {
       </div>
 
       <style jsx>{`
-        @keyframes rewirePulseAttention {
-          0%,
-          100% {
-            transform: scale(1);
-            box-shadow: 0 0 15px rgba(240, 201, 75, 0.3);
-          }
-          50% {
-            transform: scale(1.07);
-            box-shadow: 0 0 35px rgba(240, 201, 75, 0.7);
-          }
-        }
-
         @media (min-width: 992px) {
           .methodology-two-column-grid {
             grid-template-columns: 1fr 1fr !important;

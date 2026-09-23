@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Button from "../ui/Button";
+import PerformanceDiagnosticsBackground from "../ui/PerformanceDiagnosticsBackground";
 
 export default function HeroSection() {
   const canvasRef = useRef(null);
@@ -116,12 +117,12 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // Desktop Mouse Parallax Listener
+  // Desktop Mouse Parallax Listener (Subtle 8px max offset)
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 992) return;
-      const x = (e.clientX / window.innerWidth - 0.5) * 16;
-      const y = (e.clientY / window.innerHeight - 0.5) * 16;
+      const x = (e.clientX / window.innerWidth - 0.5) * 8;
+      const y = (e.clientY / window.innerHeight - 0.5) * 8;
       mouseRef.current.targetX = x;
       mouseRef.current.targetY = y;
     };
@@ -129,344 +130,7 @@ export default function HeroSection() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Multi-Tier AI Computational Interface Canvas Engine
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    let animationFrameId;
-    let width = (canvas.width = canvas.offsetWidth);
-    let height = (canvas.height = canvas.offsetHeight);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.innerWidth < 768;
-
-    // LAYER 1: LARGE AI COMPUTATIONAL STRUCTURES & INFERENCE RINGS
-    const largeStructures = [
-      { cx: width * 0.22, cy: height * 0.38, r: 160, stroke: "rgba(240, 201, 75, 0.08)", dash: [10, 14] },
-      { cx: width * 0.78, cy: height * 0.62, r: 210, stroke: "rgba(56, 189, 248, 0.07)", dash: [14, 18] },
-      { cx: width * 0.5, cy: height * 0.5, r: 310, stroke: "rgba(240, 201, 75, 0.04)", dash: [18, 24] },
-    ];
-
-    const coordMarkers = [
-      { x: width * 0.08, y: height * 0.12, label: "SYS_INFERENCE_ENGINE // 01" },
-      { x: width * 0.8, y: height * 0.1, label: "TELEMETRY_ROUTING // 04" },
-      { x: width * 0.06, y: height * 0.88, label: "DIAGNOSTIC_ORBIT // 08" },
-      { x: width * 0.85, y: height * 0.9, label: "RANK_TRAJECTORY // 12" },
-    ];
-
-    const dataGlyphs = [
-      { x: width * 0.28, y: height * 0.15, text: "INFERENCE_LATENCY = 0.02ms" },
-      { x: width * 0.74, y: height * 0.38, text: "PATTERN_ACCURACY: 94.2%" },
-      { x: width * 0.12, y: height * 0.7, text: "LEAK_IDENTIFIED: FOCUS_ENDURANCE" },
-      { x: width * 0.82, y: height * 0.78, text: "SYSTEM_STATUS: ACTIVE" },
-    ];
-
-    // LAYER 2: MEDIUM DATA NETWORK (Sized 8-14px visual diameter)
-    const clusterCenters = [
-      { x: width * 0.18, y: height * 0.32, radius: 120 },
-      { x: width * 0.36, y: height * 0.74, radius: 140 },
-      { x: width * 0.72, y: height * 0.28, radius: 150 },
-      { x: width * 0.84, y: height * 0.68, radius: 130 },
-      { x: width * 0.52, y: height * 0.48, radius: 170 },
-    ];
-
-    const nodeCount = prefersReducedMotion ? 10 : isMobile ? 22 : 38;
-    const nodes = [];
-
-    for (let i = 0; i < nodeCount; i++) {
-      const cluster = clusterCenters[i % clusterCenters.length];
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * cluster.radius;
-
-      // Hierarchy: primary node (large 5-7px radius), secondary node (3-4px radius)
-      const isPrimary = i % 4 === 0;
-      const radius = isPrimary ? (Math.random() * 2 + 5) : (Math.random() * 1.5 + 3);
-
-      nodes.push({
-        x: cluster.x + Math.cos(angle) * dist,
-        y: cluster.y + Math.sin(angle) * dist,
-        originX: cluster.x + Math.cos(angle) * dist,
-        originY: cluster.y + Math.sin(angle) * dist,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        radius,
-        isPrimary,
-        color: isPrimary
-          ? "#f0c94b"
-          : Math.random() > 0.4
-          ? "#38bdf8"
-          : Math.random() > 0.7
-          ? "#22c55e"
-          : "#f43f5e",
-        alpha: isPrimary ? 0.7 : Math.random() * 0.4 + 0.2,
-        pulseOffset: Math.random() * Math.PI * 2,
-        activeGlow: 0, // Glow pulse upon receiving data packet
-      });
-    }
-
-    // LAYER 3: FOREGROUND DIRECTIONAL DATA PACKETS (3-6px core with visible light trail)
-    const packets = [];
-    for (let p = 0; p < (isMobile ? 4 : 10); p++) {
-      const fromIdx = Math.floor(Math.random() * nodes.length);
-      const toIdx = (fromIdx + 1 + Math.floor(Math.random() * 5)) % nodes.length;
-
-      packets.push({
-        from: fromIdx,
-        to: toIdx,
-        progress: Math.random(),
-        speed: Math.random() * 0.008 + 0.004,
-        color: Math.random() > 0.35 ? "#f0c94b" : "#38bdf8",
-      });
-    }
-
-    // Active AI Inference Cluster Events
-    let inferenceEvents = [];
-    let lastEventTime = 0;
-
-    const render = (timestamp) => {
-      if (document.hidden) return; // Pause when tab is hidden
-
-      ctx.clearRect(0, 0, width, height);
-
-      // Lerp Mouse Parallax
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.04;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.04;
-      const px = mouseRef.current.x;
-      const py = mouseRef.current.y;
-
-      // Dark Graphite Base Environment
-      const bgGrad = ctx.createRadialGradient(
-        width * 0.5 + px,
-        height * 0.45 + py,
-        30,
-        width * 0.5,
-        height * 0.45,
-        width * 0.8
-      );
-      bgGrad.addColorStop(0, "rgba(18, 18, 22, 0.45)");
-      bgGrad.addColorStop(0.7, "rgba(8, 8, 10, 0.85)");
-      bgGrad.addColorStop(1, "#050505");
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // LAYER 1: LARGE AI COMPUTATIONAL STRUCTURES
-      ctx.lineWidth = 1;
-      largeStructures.forEach((struct) => {
-        ctx.strokeStyle = struct.stroke;
-        ctx.setLineDash(struct.dash);
-        ctx.beginPath();
-        ctx.arc(struct.cx + px * 0.25, struct.cy + py * 0.25, struct.r, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      });
-
-      // Computational Grid Intersections
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.018)";
-      const gridSize = 55;
-      for (let gx = 0; gx < width; gx += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(gx + px * 0.15, 0);
-        ctx.lineTo(gx + px * 0.15, height);
-        ctx.stroke();
-      }
-      for (let gy = 0; gy < height; gy += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, gy + py * 0.15);
-        ctx.lineTo(width, gy + py * 0.15);
-        ctx.stroke();
-      }
-
-      // Metadata Glyphs & Telemetry Headers
-      ctx.fillStyle = "rgba(240, 201, 75, 0.32)";
-      ctx.font = "9px monospace";
-      coordMarkers.forEach((cm) => {
-        ctx.fillText(cm.label, cm.x + px * 0.35, cm.y + py * 0.35);
-      });
-      ctx.fillStyle = "rgba(56, 189, 248, 0.26)";
-      dataGlyphs.forEach((dg) => {
-        ctx.fillText(dg.text, dg.x + px * 0.4, dg.y + py * 0.4);
-      });
-
-      // LAYER 2: MEDIUM NETWORK CONNECTIONS & NODES
-      for (let i = 0; i < nodes.length; i++) {
-        const n1 = nodes[i];
-
-        if (!prefersReducedMotion) {
-          n1.x += n1.vx;
-          n1.y += n1.vy;
-          if (Math.abs(n1.x - n1.originX) > 30) n1.vx *= -1;
-          if (Math.abs(n1.y - n1.originY) > 30) n1.vy *= -1;
-        }
-
-        const nx1 = n1.x + px * 0.55;
-        const ny1 = n1.y + py * 0.55;
-
-        // Draw network connection lines to nearby nodes
-        for (let j = i + 1; j < nodes.length; j++) {
-          const n2 = nodes[j];
-          const nx2 = n2.x + px * 0.55;
-          const ny2 = n2.y + py * 0.55;
-          const dx = nx1 - nx2;
-          const dy = ny1 - ny2;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 125) {
-            const edgeAlpha = (1 - dist / 125) * (n1.isPrimary || n2.isPrimary ? 0.22 : 0.12);
-            ctx.strokeStyle = `rgba(240, 201, 75, ${edgeAlpha})`;
-            ctx.lineWidth = n1.isPrimary && n2.isPrimary ? 1.2 : 0.7;
-            ctx.beginPath();
-            ctx.moveTo(nx1, ny1);
-            ctx.lineTo(nx2, ny2);
-            ctx.stroke();
-          }
-        }
-
-        // Render node dot with active glow pulse decay
-        if (n1.activeGlow > 0) {
-          n1.activeGlow -= 0.03;
-          ctx.beginPath();
-          ctx.arc(nx1, ny1, n1.radius * 2.2, 0, Math.PI * 2);
-          ctx.fillStyle = n1.color;
-          ctx.globalAlpha = n1.activeGlow * 0.5;
-          ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(nx1, ny1, n1.radius, 0, Math.PI * 2);
-        ctx.fillStyle = n1.color;
-        ctx.globalAlpha = n1.alpha + Math.sin(timestamp * 0.002 + n1.pulseOffset) * 0.12;
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
-      }
-
-      // LAYER 3: FOREGROUND DIRECTIONAL DATA PACKETS WITH LIGHT TRAILS
-      if (!prefersReducedMotion) {
-        packets.forEach((p) => {
-          p.progress += p.speed;
-          if (p.progress >= 1) {
-            p.progress = 0;
-            // Activate destination node glow upon arrival
-            if (nodes[p.to]) nodes[p.to].activeGlow = 1.0;
-
-            p.from = p.to;
-            p.to = (p.from + 1 + Math.floor(Math.random() * 5)) % nodes.length;
-          }
-
-          const nFrom = nodes[p.from];
-          const nTo = nodes[p.to];
-          if (nFrom && nTo) {
-            const curX = nFrom.x + px * 0.55 + (nTo.x - nFrom.x) * p.progress;
-            const curY = nFrom.y + py * 0.55 + (nTo.y - nFrom.y) * p.progress;
-            const trailX = nFrom.x + px * 0.55 + (nTo.x - nFrom.x) * Math.max(0, p.progress - 0.12);
-            const trailY = nFrom.y + py * 0.55 + (nTo.y - nFrom.y) * Math.max(0, p.progress - 0.12);
-
-            // Light Trail
-            ctx.beginPath();
-            ctx.moveTo(trailX, trailY);
-            ctx.lineTo(curX, curY);
-            ctx.strokeStyle = p.color;
-            ctx.globalAlpha = 0.45;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.globalAlpha = 1.0;
-
-            // Packet Core (3-5px core)
-            ctx.beginPath();
-            ctx.arc(curX, curY, 3.5, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.shadowColor = p.color;
-            ctx.shadowBlur = 10;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-          }
-        });
-
-        // Trigger Periodic AI Inference Event (Node cluster activation & expanding ring)
-        if (timestamp - lastEventTime > 4200) {
-          lastEventTime = timestamp;
-          const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-          if (randomNode) {
-            inferenceEvents.push({
-              x: randomNode.x + px * 0.55,
-              y: randomNode.y + py * 0.55,
-              r: 6,
-              maxR: 45,
-              alpha: 0.7,
-              color: randomNode.color,
-            });
-          }
-        }
-
-        // Render AI Inference Ring Events
-        for (let eIdx = inferenceEvents.length - 1; eIdx >= 0; eIdx--) {
-          const ev = inferenceEvents[eIdx];
-          ev.r += 1.2;
-          ev.alpha -= 0.018;
-          if (ev.alpha <= 0 || ev.r >= ev.maxR) {
-            inferenceEvents.splice(eIdx, 1);
-          } else {
-            ctx.beginPath();
-            ctx.arc(ev.x, ev.y, ev.r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(240, 201, 75, ${ev.alpha})`;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Reactive Central Aura behind Console
-      const auraGlowColor =
-        consoleStatus === "ANALYZING"
-          ? "rgba(56, 189, 248, 0.16)"
-          : consoleStatus === "READY"
-          ? "rgba(240, 201, 75, 0.22)"
-          : "rgba(34, 197, 94, 0.18)";
-
-      const centerGlow = ctx.createRadialGradient(
-        width * 0.72 + px * 0.7,
-        height * 0.48 + py * 0.7,
-        20,
-        width * 0.72,
-        height * 0.48,
-        230
-      );
-      centerGlow.addColorStop(0, auraGlowColor);
-      centerGlow.addColorStop(0.65, "rgba(240, 201, 75, 0.02)");
-      centerGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = centerGlow;
-      ctx.fillRect(0, 0, width, height);
-
-      if (!prefersReducedMotion) {
-        animationFrameId = requestAnimationFrame(render);
-      }
-    };
-
-    render(0);
-
-    // Pause canvas when tab is hidden
-    const handleVisibilityChange = () => {
-      if (!document.hidden && !prefersReducedMotion) {
-        render(performance.now());
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    };
-  }, [consoleStatus]);
 
   const progressMetrics = [
     { label: "FOCUS ENDURANCE", val: "78%", pct: 78, color: "var(--color-status-amber)" },
@@ -482,26 +146,21 @@ export default function HeroSection() {
     <section
       id="home"
       style={{
-        paddingTop: "calc(64px + 1rem)", // 20% tighter navbar top gap
-        paddingBottom: "4.5rem",
+        minHeight: "100svh", // Full viewport height cinematic screen
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        paddingTop: "76px", // Navbar height clearance
+        paddingBottom: "2rem",
+        boxSizing: "border-box",
         backgroundColor: "var(--color-background)",
         position: "relative",
         overflow: "hidden",
         borderBottom: "1px solid var(--color-border-subtle)",
       }}
     >
-      {/* Multi-Tier AI Computational Canvas Engine */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          pointerEvents: "none",
-          zIndex: 1,
-        }}
-      />
+      {/* Performance Diagnostics Live Background (Exact Shared Component) */}
+      <PerformanceDiagnosticsBackground />
 
       <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <div
@@ -574,7 +233,7 @@ export default function HeroSection() {
                 maxWidth: "580px",
               }}
             >
-              Your marks are telling you what happened. CNM System Labs helps uncover why - whether the problem is focus, accuracy, revision, time management, confidence, test strategy or execution - and turns that diagnosis into a measurable plan.
+              Your marks aren't stuck because you lack capability. They're stuck because unseen performance leaks drain your accuracy, speed, and exam confidence. CNM System Labs diagnoses the root cause and builds a daily execution system to fix it.
             </p>
 
             {/* CTAs */}
@@ -591,6 +250,7 @@ export default function HeroSection() {
                 href={AUDIT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn-filled"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -604,7 +264,6 @@ export default function HeroSection() {
                   borderRadius: "var(--radius-md)",
                   textDecoration: "none",
                   boxShadow: "0 4px 20px rgba(212, 175, 55, 0.4)",
-                  transition: "all 0.25s ease",
                 }}
               >
                 START ONLINE PERFORMANCE AUDIT →
@@ -915,6 +574,7 @@ export default function HeroSection() {
                 href={AUDIT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="console-cta-btn"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -930,7 +590,6 @@ export default function HeroSection() {
                   fontSize: "0.75rem",
                   letterSpacing: "0.08em",
                   textDecoration: "none",
-                  transition: "all 0.25s ease",
                   textAlign: "center",
                 }}
               >
@@ -956,6 +615,26 @@ export default function HeroSection() {
           filter: blur(25px);
         }
 
+        /* Console CTA Button Premium Hover Behavior */
+        :global(.console-cta-btn) {
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+          transform-origin: center center;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          :global(.console-cta-btn:hover) {
+            transform: scale(1.03) !important;
+            background-color: rgba(212, 175, 55, 0.22) !important;
+            border-color: var(--color-gold-bright) !important;
+            box-shadow: 0 0 20px rgba(240, 201, 75, 0.35) !important;
+            color: #ffffff !important;
+          }
+        }
+
+        :global(.console-cta-btn:active) {
+          transform: scale(0.98) !important;
+        }
+
         /* Card Sensor Hover Zoom & Micro-glow */
         :global(.sensor-card:hover) {
           transform: scale(1.04) translateY(-3px) !important;
@@ -971,16 +650,6 @@ export default function HeroSection() {
           100% {
             transform: translateX(100%);
           }
-        }
-
-        :global(.hero-cta-btn:hover) {
-          background-color: var(--color-accent-hover) !important;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 30px rgba(240, 201, 75, 0.5) !important;
-        }
-
-        :global(.hero-cta-btn:hover .btn-arrow) {
-          transform: translateX(4px);
         }
 
         @media (min-width: 992px) {

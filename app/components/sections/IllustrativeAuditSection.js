@@ -4,46 +4,79 @@ import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
 export default function IllustrativeAuditSection() {
-  const [inView, setInView] = useState(false);
-  const [scoreVal, setScoreVal] = useState(60);
+  const [gainVal, setGainVal] = useState(0); // Animated counter for +14 MARKS
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  const sectionRef = useRef(null);
+  // Per-element scroll observers
+  const [card1Visible, setCard1Visible] = useState(false);
+  const [card2Visible, setCard2Visible] = useState(false);
+  const [card3Visible, setCard3Visible] = useState(false);
+
+  const card1Ref = useRef(null);
+  const card2Ref = useRef(null);
+  const card3Ref = useRef(null);
   const canvasRef = useRef(null);
 
-  // Scroll Trigger via IntersectionObserver
+  // Element-level Scroll Observers for Cards 01, 02, 03
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setInView(true);
-          observer.disconnect();
+    const obs1 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCard1Visible(true);
+          obs1.disconnect();
         }
       },
-      { threshold: 0.25 }
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
     );
+    if (card1Ref.current) obs1.observe(card1Ref.current);
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    const obs2 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCard2Visible(true);
+          obs2.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
+    );
+    if (card2Ref.current) obs2.observe(card2Ref.current);
 
-    return () => observer.disconnect();
+    const obs3 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCard3Visible(true);
+          obs3.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
+    );
+    if (card3Ref.current) obs3.observe(card3Ref.current);
+
+    return () => {
+      obs1.disconnect();
+      obs2.disconnect();
+      obs3.disconnect();
+    };
   }, []);
 
-  // Score Count-up when section enters view
+  // Gain Count-up (+00 to +14 MARKS) triggered ONLY when Card 03 becomes visible on scroll
   useEffect(() => {
-    if (!inView) return;
+    if (!card3Visible) return;
 
-    let start = 60;
-    const target = 74;
+    let start = 0;
+    const target = 14;
     const interval = setInterval(() => {
-      start += 1;
-      setScoreVal(start);
-      if (start >= target) clearInterval(interval);
-    }, 80);
+      start += 2;
+      if (start >= target) {
+        setGainVal(target);
+        clearInterval(interval);
+      } else {
+        setGainVal(start);
+      }
+    }, 100);
 
     return () => clearInterval(interval);
-  }, [inView]);
+  }, [card3Visible]);
 
   // Ascending Data Trajectories Live Canvas Background
   useEffect(() => {
@@ -65,7 +98,6 @@ export default function IllustrativeAuditSection() {
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Graph trajectory lines & statistical particles
     const trajectoryLines = [
       { startX: width * 0.1, startY: height * 0.8, endX: width * 0.4, endY: height * 0.3, progress: 0 },
       { startX: width * 0.35, startY: height * 0.85, endX: width * 0.75, endY: height * 0.25, progress: 0.3 },
@@ -75,15 +107,15 @@ export default function IllustrativeAuditSection() {
     const dataPoints = Array.from({ length: 15 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vy: - (Math.random() * 0.4 + 0.2),
+      vy: -(Math.random() * 0.4 + 0.2),
       alpha: Math.random() * 0.35 + 0.15,
       radius: Math.random() * 2 + 1,
     }));
 
     const render = () => {
+      if (document.hidden) return;
       ctx.clearRect(0, 0, width, height);
 
-      // Faint Ascending Grid Lines
       ctx.strokeStyle = "rgba(212, 175, 55, 0.03)";
       ctx.lineWidth = 1;
       const step = 65;
@@ -101,7 +133,6 @@ export default function IllustrativeAuditSection() {
       }
 
       if (!prefersReducedMotion) {
-        // Ascending Trajectory Lines
         trajectoryLines.forEach((line) => {
           line.progress += 0.004;
           if (line.progress > 1) line.progress = 0;
@@ -114,7 +145,6 @@ export default function IllustrativeAuditSection() {
           ctx.stroke();
           ctx.setLineDash([]);
 
-          // Traveling pulse on trajectory
           const px = line.startX + (line.endX - line.startX) * line.progress;
           const py = line.startY + (line.endY - line.startY) * line.progress;
           ctx.beginPath();
@@ -126,7 +156,6 @@ export default function IllustrativeAuditSection() {
           ctx.shadowBlur = 0;
         });
 
-        // Rising statistical points
         dataPoints.forEach((p) => {
           p.y += p.vy;
           if (p.y < 0) p.y = height;
@@ -171,9 +200,8 @@ export default function IllustrativeAuditSection() {
   return (
     <section
       id="illustrative-audit"
-      ref={sectionRef}
       style={{
-        padding: "5.5rem 0",
+        padding: "6rem 0",
         backgroundColor: "#060608",
         borderBottom: "1px solid var(--color-border-subtle)",
         position: "relative",
@@ -213,14 +241,12 @@ export default function IllustrativeAuditSection() {
             fontSize: "0.78rem",
             color: "var(--color-gold-bright)",
             fontWeight: 600,
-            opacity: inView ? 1 : 0,
-            transition: "opacity 0.6s ease",
           }}
         >
           NOTE: Illustrative example based on real diagnostic data models - actual results vary by student, starting point, and daily execution.
         </div>
 
-        {/* Main Case Study UI Card (Stationary Parent Wrapper) */}
+        {/* Main Case Study UI Card */}
         <div
           style={{
             backgroundColor: "rgba(14, 14, 18, 0.95)",
@@ -229,29 +255,17 @@ export default function IllustrativeAuditSection() {
             padding: "2.5rem",
             backdropFilter: "blur(10px)",
             boxShadow: "0 20px 50px rgba(0, 0, 0, 0.8)",
-            transition: "opacity 0.6s ease, filter 0.6s ease",
-            opacity: inView ? 1 : 0,
-            filter: inView ? "blur(0px)" : "blur(8px)",
-            transform: "none", // Parent container remains completely stationary
           }}
         >
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "2.5rem",
             }}
-            className="audit-grid"
           >
-            {/* Left: Starting Metrics Telemetry (Card 1 - Stagger Entrance 0ms) */}
-            <div
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(16px)",
-                transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                transitionDelay: "100ms",
-              }}
-            >
+            {/* Left Column: Starting Metrics Baseline */}
+            <div>
               <div
                 style={{
                   fontSize: "0.72rem",
@@ -291,7 +305,6 @@ export default function IllustrativeAuditSection() {
                         <span style={{ fontWeight: 800, color: m.color }}>{m.val}%</span>
                       </div>
                     </div>
-                    {/* Bar */}
                     <div
                       style={{
                         width: "100%",
@@ -304,7 +317,7 @@ export default function IllustrativeAuditSection() {
                       <div
                         style={{
                           height: "100%",
-                          width: inView ? `${m.val}%` : "0%",
+                          width: `${m.val}%`,
                           backgroundColor: m.color,
                           borderRadius: "4px",
                           transition: "width 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -316,10 +329,12 @@ export default function IllustrativeAuditSection() {
               </div>
             </div>
 
-            {/* Right: Diagnosis, Intervention & Score Trajectory */}
+            {/* Right Column: 3 Sequenced Diagnostic Cards with Element-Level Viewport Triggers */}
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
-              {/* Primary Diagnosis Box (Card 2 - Hover Scale & Stagger Entrance 220ms) */}
+              
+              {/* Card 01: Primary Diagnosis (Enters from LEFT when user reaches it) */}
               <div
+                ref={card1Ref}
                 onMouseEnter={() => setHoveredCard(0)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
@@ -327,12 +342,12 @@ export default function IllustrativeAuditSection() {
                   border: hoveredCard === 0 ? "1px solid var(--color-status-red)" : "1px solid rgba(239, 68, 68, 0.4)",
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
-                  transform: inView ? (hoveredCard === 0 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
-                  opacity: inView ? 1 : 0,
+                  transform: card1Visible
+                    ? (hoveredCard === 0 ? "scale(1.03) translateY(-2px)" : "translateX(0) scale(1)")
+                    : "translateX(-60px) scale(0.97)",
+                  opacity: card1Visible ? 1 : 0,
                   boxShadow: hoveredCard === 0 ? "0 10px 30px rgba(239, 68, 68, 0.22)" : "none",
-                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease",
-                  transitionDelay: inView ? "220ms" : "0ms",
-                  cursor: "pointer",
+                  transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease",
                 }}
               >
                 <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-status-red)" }}>
@@ -346,8 +361,9 @@ export default function IllustrativeAuditSection() {
                 </p>
               </div>
 
-              {/* Intervention Protocol List (Card 3 - Hover Scale & Stagger Entrance 340ms) */}
+              {/* Card 02: Recommended Intervention (Enters from RIGHT when user reaches it) */}
               <div
+                ref={card2Ref}
                 onMouseEnter={() => setHoveredCard(1)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
@@ -355,12 +371,12 @@ export default function IllustrativeAuditSection() {
                   border: hoveredCard === 1 ? "1px solid var(--color-gold-bright)" : "1px solid var(--color-border-gold)",
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
-                  transform: inView ? (hoveredCard === 1 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
-                  opacity: inView ? 1 : 0,
+                  transform: card2Visible
+                    ? (hoveredCard === 1 ? "scale(1.03) translateY(-2px)" : "translateX(0) scale(1)")
+                    : "translateX(60px) scale(0.97)",
+                  opacity: card2Visible ? 1 : 0,
                   boxShadow: hoveredCard === 1 ? "0 10px 30px rgba(240, 201, 75, 0.22)" : "none",
-                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease",
-                  transitionDelay: inView ? "340ms" : "0ms",
-                  cursor: "pointer",
+                  transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease",
                 }}
               >
                 <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-gold-bright)" }}>
@@ -385,8 +401,9 @@ export default function IllustrativeAuditSection() {
                 </ul>
               </div>
 
-              {/* Score Trajectory Summary with Count-up (Card 4 - Hover Scale & Stagger Entrance 460ms) */}
+              {/* Card 03: Score Trajectory Summary (Enters from LEFT when user reaches it, triggers count-up) */}
               <div
+                ref={card3Ref}
                 onMouseEnter={() => setHoveredCard(2)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
@@ -395,38 +412,56 @@ export default function IllustrativeAuditSection() {
                   borderRadius: "var(--radius-md)",
                   padding: "1.25rem",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  transform: inView ? (hoveredCard === 2 ? "scale(1.03) translateY(-2px)" : "scale(1) translateY(0)") : "translateY(16px)",
-                  opacity: inView ? 1 : 0,
-                  boxShadow: hoveredCard === 2 ? "0 10px 30px rgba(240, 201, 75, 0.3)" : "none",
-                  transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background-color 0.3s ease, box-shadow 0.3s ease",
-                  transitionDelay: inView ? "460ms" : "0ms",
-                  cursor: "pointer",
+                  flexDirection: "column",
+                  gap: "0.85rem",
+                  transform: card3Visible
+                    ? (hoveredCard === 2 ? "scale(1.03) translateY(-2px)" : "translateX(0) scale(1)")
+                    : "translateX(-60px) scale(0.97)",
+                  opacity: card3Visible ? 1 : 0,
+                  boxShadow: hoveredCard === 2 ? "0 10px 30px rgba(240, 201, 75, 0.3)" : "0 0 15px rgba(240, 201, 75, 0.1)",
+                  transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, box-shadow 0.3s ease",
                 }}
               >
-                <div>
-                  <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-text-muted)" }}>
-                    SCORE TRANSFORMATION POTENTIAL
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-text-muted)" }}>
+                      SCORE TRANSFORMATION POTENTIAL
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", marginTop: "4px" }}>
+                      <span style={{ fontSize: "1.35rem", fontWeight: 800, color: "#ffffff" }}>CURRENT: 60</span>
+                      <span style={{ fontSize: "1.1rem", color: "var(--color-gold-bright)" }}>➔</span>
+                      <span style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--color-gold-bright)" }}>TARGET: 74</span>
+                    </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", marginTop: "4px" }}>
-                    <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "#ffffff" }}>CURRENT: {scoreVal}</span>
-                    <span style={{ fontSize: "1.2rem", color: "var(--color-gold-bright)" }}>➔</span>
-                    <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--color-gold-bright)" }}>TARGET: 74</span>
+                  <div
+                    style={{
+                      backgroundColor: "rgba(34, 197, 94, 0.15)",
+                      border: "1px solid var(--color-status-green)",
+                      color: "var(--color-status-green)",
+                      padding: "0.5rem 1rem",
+                      borderRadius: "var(--radius-md)",
+                      fontWeight: 800,
+                      fontSize: "1rem",
+                      boxShadow: gainVal === 14 ? "0 0 15px rgba(34, 197, 94, 0.4)" : "none",
+                      transition: "box-shadow 0.4s ease",
+                    }}
+                  >
+                    +{String(gainVal).padStart(2, "0")} MARKS
                   </div>
                 </div>
-                <div
-                  style={{
-                    backgroundColor: "rgba(34, 197, 94, 0.15)",
-                    border: "1px solid var(--color-status-green)",
-                    color: "var(--color-status-green)",
-                    padding: "0.5rem 1rem",
-                    borderRadius: "var(--radius-md)",
-                    fontWeight: 800,
-                    fontSize: "1rem",
-                  }}
-                >
-                  +14 MARKS
+
+                {/* Synchronized Animated Progress Bar & Signal Pulse */}
+                <div style={{ width: "100%", height: "6px", backgroundColor: "rgba(255, 255, 255, 0.08)", borderRadius: "3px", overflow: "hidden", position: "relative" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${(gainVal / 14) * 100}%`,
+                      background: "linear-gradient(90deg, #f0c94b, #22c55e)",
+                      borderRadius: "3px",
+                      transition: "width 0.15s linear",
+                      boxShadow: "0 0 10px #22c55e",
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -438,35 +473,25 @@ export default function IllustrativeAuditSection() {
             href={AUDIT_URL}
             target="_blank"
             rel="noopener noreferrer"
+            className="btn-filled"
             style={{
               display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
               gap: "0.5rem",
+              padding: "0.95rem 2.25rem",
               backgroundColor: "var(--color-gold-bright)",
               color: "#050505",
               fontWeight: 800,
               fontSize: "0.95rem",
-              padding: "0.85rem 1.75rem",
               borderRadius: "var(--radius-md)",
               textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
-              transition: "all 0.2s ease",
+              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.4)",
             }}
           >
-            RUN YOUR PERSONAL PERFORMANCE AUDIT →
+            RUN YOUR OWN PERFORMANCE AUDIT →
           </a>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (min-width: 992px) {
-          .audit-grid {
-            grid-template-columns: 1fr 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
-

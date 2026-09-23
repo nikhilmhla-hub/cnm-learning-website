@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
 export default function ProductControlRoomSection() {
   const [activeTab, setActiveTab] = useState(0);
+  const canvasRef = useRef(null);
 
   const categories = [
     {
@@ -104,16 +105,117 @@ export default function ProductControlRoomSection() {
     },
   ];
 
+  // Control Room Data Grid Canvas Background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const dataNodes = Array.from({ length: 16 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 2 + 1,
+      alpha: Math.random() * 0.35 + 0.15,
+      color: Math.random() > 0.5 ? "rgba(240, 201, 75, " : "rgba(56, 189, 248, ",
+    }));
+
+    let t = 0;
+
+    const render = () => {
+      if (document.hidden) return;
+      ctx.clearRect(0, 0, width, height);
+      t += 0.005;
+
+      // Dark radial overlay
+      const bgGrad = ctx.createRadialGradient(
+        width * 0.5,
+        height * 0.5,
+        30,
+        width * 0.5,
+        height * 0.5,
+        width * 0.8
+      );
+      bgGrad.addColorStop(0, "rgba(10, 12, 16, 0.4)");
+      bgGrad.addColorStop(1, "#050505");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Faint Control Room Grid
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.02)";
+      ctx.lineWidth = 1;
+      const step = 80;
+      for (let x = 0; x < width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      if (!prefersReducedMotion) {
+        dataNodes.forEach((node) => {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+          ctx.fillStyle = `${node.color}${node.alpha})`;
+          ctx.fill();
+        });
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   return (
     <section
       id="control-room"
       style={{
-        padding: "5.5rem 0",
+        padding: "6rem 0",
         backgroundColor: "var(--color-background)",
         borderBottom: "1px solid var(--color-border-subtle)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div className="container">
+      {/* Full-Section Live Background Canvas */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <SectionHeading
           eyebrow="PRODUCT SYSTEM ARCHITECTURE"
           title="Your Performance Has a Control Room."

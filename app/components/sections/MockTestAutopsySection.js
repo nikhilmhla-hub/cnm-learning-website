@@ -4,64 +4,85 @@ import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
 export default function MockTestAutopsySection() {
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const [inView, setInView] = useState(false);
-  const [hoveredErrorIdx, setHoveredErrorIdx] = useState(null);
+  const [hoveredCardIdx, setHoveredCardIdx] = useState(null);
 
-  // Score Count-up State (0 to 122)
+  // Per-element scroll observers
+  const [scoreInView, setScoreInView] = useState(false);
   const [scoreVal, setScoreVal] = useState(0);
-  const [isCalculating, setIsCalculating] = useState(true);
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  const sectionRef = useRef(null);
+  const [cardsInView, setCardsInView] = useState(false);
+  const [visibleCardsCount, setVisibleCardsCount] = useState(0);
+
+  const scoreRef = useRef(null);
+  const cardsRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Scroll Trigger via IntersectionObserver (Trigger ONCE per session)
+  // Element-level Scroll Observers
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setInView(true);
-          observer.disconnect();
+    const scoreObs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setScoreInView(true);
+          scoreObs.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
     );
+    if (scoreRef.current) scoreObs.observe(scoreRef.current);
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    const cardsObs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCardsInView(true);
+          cardsObs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
+    );
+    if (cardsRef.current) cardsObs.observe(cardsRef.current);
 
-    return () => observer.disconnect();
+    return () => {
+      scoreObs.disconnect();
+      cardsObs.disconnect();
+    };
   }, []);
 
-  // Score Count-up Sequence (0 -> 122) on Section Entrance
+  // Score Count-up Sequence (0 -> 122) triggered ONLY when score card enters viewport
   useEffect(() => {
-    if (!inView || hasCalculated) return;
+    if (!scoreInView || hasCalculated) return;
 
-    setIsCalculating(true);
     let start = 0;
     const target = 122;
+    const interval = setInterval(() => {
+      start += 6;
+      if (start >= target) {
+        setScoreVal(target);
+        setHasCalculated(true);
+        clearInterval(interval);
+      } else {
+        setScoreVal(start);
+      }
+    }, 45);
 
-    // Brief 350ms processing pause before rapid count-up
-    const delayTimer = setTimeout(() => {
-      setIsCalculating(false);
-      const interval = setInterval(() => {
-        start += 7;
-        if (start >= target) {
-          setScoreVal(target);
-          setHasCalculated(true);
-          clearInterval(interval);
-        } else {
-          setScoreVal(start);
-        }
-      }, 35);
-    }, 350);
+    return () => clearInterval(interval);
+  }, [scoreInView, hasCalculated]);
 
-    return () => clearTimeout(delayTimer);
-  }, [inView, hasCalculated]);
+  // One-by-One Card Entrance Trigger with Noticeable Pause (~450ms per card)
+  useEffect(() => {
+    if (!cardsInView) return;
 
-  // Digital Test Analysis Laboratory Canvas Background
+    let count = 0;
+    const timer = setInterval(() => {
+      count += 1;
+      setVisibleCardsCount(count);
+      if (count >= 4) clearInterval(timer);
+    }, 450); // 450ms stagger per card
+
+    return () => clearInterval(timer);
+  }, [cardsInView]);
+
+  // Full-Section Live Background Canvas (Forensic Atmosphere)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -81,29 +102,36 @@ export default function MockTestAutopsySection() {
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // LAYER 1: Diagnostic Grid & Question Markers
-    const questionMarkers = [
-      { x: width * 0.15, y: height * 0.25, label: "Q_14 [CONCEPT_GAP]" },
-      { x: width * 0.85, y: height * 0.3, label: "Q_22 [CALC_ERROR]" },
-      { x: width * 0.1, y: height * 0.75, label: "Q_29 [MISREAD_UNITS]" },
-      { x: width * 0.88, y: height * 0.8, label: "Q_41 [TIME_EXHAUSTED]" },
+    const rings = [
+      { cx: width * 0.18, cy: height * 0.35, r: 160, alpha: 0.04 },
+      { cx: width * 0.82, cy: height * 0.65, r: 210, alpha: 0.03 },
     ];
 
-    // LAYER 2 & 3: Moving Analysis Light Beams & Signals
-    const lightBeams = [
-      { startX: width * 0.05, startY: height * 0.2, endX: width * 0.45, endY: height * 0.8, progress: 0, color: "#f43f5e" },
-      { startX: width * 0.55, startY: height * 0.1, endX: width * 0.95, endY: height * 0.7, progress: 0.3, color: "#f0c94b" },
-      { startX: width * 0.2, startY: height * 0.9, endX: width * 0.8, endY: height * 0.15, progress: 0.6, color: "#38bdf8" },
+    const scanLines = [
+      { startX: width * 0.1, startY: height * 0.1, endX: width * 0.45, endY: height * 0.9, progress: 0, speed: 0.0006, color: "rgba(244, 63, 94, 0.25)" },
+      { startX: width * 0.55, startY: height * 0.05, endX: width * 0.9, endY: height * 0.85, progress: 0.4, speed: 0.0005, color: "rgba(240, 201, 75, 0.22)" },
     ];
 
     const render = () => {
       if (document.hidden) return;
       ctx.clearRect(0, 0, width, height);
 
-      // Faint Test-Analysis Background Grid
-      ctx.strokeStyle = "rgba(244, 63, 94, 0.03)";
+      const bgGrad = ctx.createRadialGradient(
+        width * 0.5,
+        height * 0.45,
+        40,
+        width * 0.5,
+        height * 0.45,
+        width * 0.8
+      );
+      bgGrad.addColorStop(0, "rgba(12, 10, 14, 0.3)");
+      bgGrad.addColorStop(1, "#07070a");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = "rgba(244, 63, 94, 0.018)";
       ctx.lineWidth = 1;
-      const step = 60;
+      const step = 75;
       for (let x = 0; x < width; x += step) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -117,47 +145,35 @@ export default function MockTestAutopsySection() {
         ctx.stroke();
       }
 
-      // Question Markers
-      ctx.fillStyle = "rgba(244, 63, 94, 0.25)";
-      ctx.font = "9px monospace";
-      questionMarkers.forEach((qm) => {
-        ctx.fillText(qm.label, qm.x, qm.y);
+      rings.forEach((ring) => {
+        ctx.strokeStyle = `rgba(244, 63, 94, ${ring.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([8, 12]);
+        ctx.beginPath();
+        ctx.arc(ring.cx, ring.cy, ring.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
       });
 
       if (!prefersReducedMotion) {
-        // Moving Analysis Signal Beams
-        lightBeams.forEach((beam) => {
-          beam.progress += 0.0035;
-          if (beam.progress > 1) beam.progress = 0;
+        scanLines.forEach((path) => {
+          path.progress += path.speed;
+          if (path.progress > 1) path.progress = 0;
 
           ctx.beginPath();
-          ctx.moveTo(beam.startX, beam.startY);
-          ctx.lineTo(beam.endX, beam.endY);
-          ctx.strokeStyle = "rgba(244, 63, 94, 0.06)";
-          ctx.setLineDash([6, 10]);
+          ctx.moveTo(path.startX, path.startY);
+          ctx.lineTo(path.endX, path.endY);
+          ctx.strokeStyle = "rgba(244, 63, 94, 0.04)";
           ctx.stroke();
-          ctx.setLineDash([]);
 
-          // Moving Light Signal Head
-          const curX = beam.startX + (beam.endX - beam.startX) * beam.progress;
-          const curY = beam.startY + (beam.endY - beam.startY) * beam.progress;
-          const trailX = beam.startX + (beam.endX - beam.startX) * Math.max(0, beam.progress - 0.1);
-          const trailY = beam.startY + (beam.endY - beam.startY) * Math.max(0, beam.progress - 0.1);
-
-          ctx.beginPath();
-          ctx.moveTo(trailX, trailY);
-          ctx.lineTo(curX, curY);
-          ctx.strokeStyle = beam.color;
-          ctx.globalAlpha = 0.4;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.globalAlpha = 1.0;
+          const curX = path.startX + (path.endX - path.startX) * path.progress;
+          const curY = path.startY + (path.endY - path.startY) * path.progress;
 
           ctx.beginPath();
           ctx.arc(curX, curY, 3, 0, Math.PI * 2);
-          ctx.fillStyle = beam.color;
-          ctx.shadowColor = beam.color;
-          ctx.shadowBlur = 10;
+          ctx.fillStyle = path.color;
+          ctx.shadowColor = path.color;
+          ctx.shadowBlur = 8;
           ctx.fill();
           ctx.shadowBlur = 0;
         });
@@ -168,102 +184,52 @@ export default function MockTestAutopsySection() {
 
     render();
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden && !prefersReducedMotion) {
-        render();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       window.removeEventListener("resize", handleResize);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
-  const errorCategories = [
+  const diagnosticCards = [
     {
-      title: "Concept Gap",
-      count: 9,
-      percentage: "29%",
+      num: "01",
+      title: "Concept Gaps",
+      count: "9 Questions Lost",
+      impact: "-36 Marks",
+      direction: "RIGHT", // enters from RIGHT
       color: "#f43f5e",
-      desc: "Fundamental misunderstanding of core principle",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z" />
-          <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z" />
-        </svg>
-      ),
-      pattern: "Losing marks on novel or multi-concept JEE questions because concept was memorized rote.",
-      intervention: "Re-watch 3D visual concept derivations + solve 15 structured foundation problems.",
+      pattern: "Rote memorization breaks when JEE/NEET questions combine 2+ concepts.",
+      fix: "3D visual concept derivations + 15 structured foundation problems.",
     },
     {
-      title: "Misread Question",
-      count: 7,
-      percentage: "23%",
+      num: "02",
+      title: "Misread Question Constraints",
+      count: "7 Questions Lost",
+      impact: "-28 Marks",
+      direction: "LEFT", // enters from LEFT
       color: "#f59e0b",
-      desc: "Missed 'NOT', wrong units, or incorrect condition",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
-      ),
-      pattern: "Reading questions too fast in the first 30 seconds, skipping constraints like 'at STP' or 'incorrect'.",
-      intervention: "Keyword underline protocol during question reading + slow-down checklist.",
+      pattern: "Reading questions too fast, skipping 'NOT', 'STP', or unit changes.",
+      fix: "Keyword underline protocol + 30-second question scanning checklist.",
     },
     {
-      title: "Calculation Error",
-      count: 6,
-      percentage: "19%",
-      color: "#f0c94b",
-      desc: "Arithmetic mistake or sign inversion during algebra",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f0c94b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="4" y="2" width="16" height="20" rx="2" />
-          <line x1="8" y1="6" x2="16" y2="6" />
-          <line x1="16" y1="14" x2="16" y2="18" />
-          <path d="M16 10h.01" />
-          <path d="M12 10h.01" />
-          <path d="M8 10h.01" />
-          <path d="M12 14h.01" />
-          <path d="M8 14h.01" />
-          <path d="M12 18h.01" />
-          <path d="M8 18h.01" />
-        </svg>
-      ),
-      pattern: "Sloppy rough work leading to sign errors (+/-) and power-of-10 mistakes in physics numericals.",
-      intervention: "Structured 2-column scratchpad layout + mandatory step verification.",
-    },
-    {
-      title: "Time Pressure",
-      count: 5,
-      percentage: "16%",
+      num: "03",
+      title: "Calculation & Formula Slip",
+      count: "6 Questions Lost",
+      impact: "-24 Marks",
+      direction: "RIGHT", // enters from RIGHT
       color: "#38bdf8",
-      desc: "Rushed solving in final 20 minutes of exam",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      ),
-      pattern: "Spending 8+ minutes stuck on 1 hard problem early, forcing rushed solving at the end.",
-      intervention: "2-minute question skip rule + timed 15-question sprint blocks.",
+      pattern: "Arithmetic slips in multi-step equations under time stress.",
+      fix: "Rough-work layout format + 10-minute daily speed calculation drills.",
     },
     {
-      title: "Weak Topic",
-      count: 4,
-      percentage: "13%",
-      color: "#a855f7",
-      desc: "Unmastered sub-topic (e.g. Ionic Equilibrium)",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-        </svg>
-      ),
-      pattern: "Consistently skipping or guessing questions from specific sub-chapters due to fear.",
-      intervention: "Targeted 90-minute topic recovery module in Learning Ledger.",
+      num: "04",
+      title: "Time Pressure Panic",
+      count: "4 Questions Lost",
+      impact: "-16 Marks",
+      direction: "LEFT", // enters from LEFT
+      color: "#8b5cf6",
+      pattern: "Spending 6+ minutes on tough Qs, starving easy questions at the end.",
+      fix: "3-pass exam execution strategy + 90-second question skip rule.",
     },
   ];
 
@@ -272,16 +238,15 @@ export default function MockTestAutopsySection() {
   return (
     <section
       id="mock-autopsy"
-      ref={sectionRef}
       style={{
-        padding: "5.5rem 0",
+        padding: "6rem 0",
         backgroundColor: "#07070a",
         borderBottom: "1px solid var(--color-border-subtle)",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Digital Test Analysis Laboratory Canvas Layer */}
+      {/* Full-Section Live Background Canvas */}
       <canvas
         ref={canvasRef}
         style={{
@@ -297,332 +262,208 @@ export default function MockTestAutopsySection() {
       <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <SectionHeading
           eyebrow="MOCK TEST AUTOPSY SYSTEM"
-          title="A Test Score Is Not a Diagnosis."
-          description="Two students can score 122 for completely different reasons. Merely looking at the score fixes nothing."
+          title="A Mock Test Score is Not Just a Number. It's a Forensic Investigation."
+          description="CNM opens your mock result and dissects WHAT happened, WHERE marks leaked, WHY errors occurred, and HOW to fix them."
           center={true}
         />
 
-        {/* Comparison Banner: Traditional Score vs CNM Autopsy Panel */}
+        {/* Traditional Test Result Card - Element-level Scroll Trigger */}
         <div
+          ref={scoreRef}
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "2rem",
-            marginTop: "3.5rem",
+            maxWidth: "680px",
+            margin: "3rem auto 0 auto",
+            backgroundColor: "rgba(18, 14, 18, 0.94)",
+            border: "1px solid rgba(244, 63, 94, 0.4)",
+            borderRadius: "var(--radius-lg)",
+            padding: "2rem 2.5rem",
+            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "1.5rem",
+            position: "relative",
+            overflow: "hidden",
+            opacity: scoreInView ? 1 : 0,
+            transform: scoreInView ? "translateY(0) scale(1)" : "translateY(30px) scale(0.97)",
+            transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
-          className="autopsy-grid"
         >
-          {/* Traditional Score Output (Active Visual Treatment with Score Count-up) */}
+          {/* Laser Scan Beam */}
           <div
             style={{
-              backgroundColor: "rgba(14, 14, 19, 0.95)",
-              border: "1px solid rgba(244, 63, 94, 0.4)",
-              borderRadius: "var(--radius-lg)",
-              padding: "2rem",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              gap: "1rem",
-              boxShadow: "0 0 30px rgba(244, 63, 94, 0.15), 0 15px 40px rgba(0, 0, 0, 0.9)",
-              position: "relative",
-              overflow: "hidden",
-              transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease",
-              opacity: inView ? 1 : 0,
-              filter: inView ? "blur(0px)" : "blur(8px)",
-              transform: inView ? "translateY(0)" : "translateY(20px)",
-              transitionDelay: "100ms",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "2px",
+              background: "linear-gradient(90deg, transparent, #f43f5e, transparent)",
+              boxShadow: "0 0 15px #f43f5e",
+              animation: "laserScan 3s linear infinite",
             }}
-          >
-            {/* Live Indicator Strip */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span
-                style={{
-                  width: "7px",
-                  height: "7px",
-                  borderRadius: "50%",
-                  backgroundColor: "#f43f5e",
-                  boxShadow: "0 0 8px #f43f5e",
-                }}
-              />
-              <span style={{ fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.12em", color: "var(--color-text-muted)" }}>
-                TRADITIONAL TEST RESULT
-              </span>
-            </div>
+          />
 
-            {/* Score 122 Display with Count-up Sequence */}
-            <div
+          <div>
+            <span
               style={{
-                fontSize: "4.5rem",
+                fontSize: "0.72rem",
                 fontWeight: 800,
-                color: hasCalculated ? "#ffffff" : "var(--color-gold-bright)",
-                lineHeight: 1,
-                textShadow: hasCalculated ? "0 0 20px rgba(244, 63, 94, 0.4)" : "0 0 15px rgba(240, 201, 75, 0.5)",
-                transition: "color 0.4s ease, text-shadow 0.4s ease",
+                letterSpacing: "0.12em",
+                color: "#f43f5e",
+                backgroundColor: "rgba(244, 63, 94, 0.12)",
+                padding: "0.25rem 0.6rem",
+                borderRadius: "4px",
+                border: "1px solid rgba(244, 63, 94, 0.3)",
               }}
             >
-              {isCalculating ? (
-                <span style={{ fontSize: "1.4rem", letterSpacing: "0.08em" }}>CALCULATING...</span>
-              ) : (
-                String(scoreVal).padStart(3, "0")
-              )}
-            </div>
-
-            <p style={{ fontSize: "0.92rem", color: "var(--color-text-secondary)", maxWidth: "320px", lineHeight: 1.5 }}>
-              "You scored 122 / 300. Work harder and study more chapters."
+              INPUT MOCK SCORE RESULT
+            </span>
+            <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginTop: "0.6rem", margin: 0 }}>
+              JEE / NEET MOCK TEST #04
+            </h3>
+            <p style={{ fontSize: "0.82rem", color: "var(--color-text-secondary)", margin: "0.3rem 0 0 0" }}>
+              Total 300 Marks | Diagnostic Autopsy Triggered
             </p>
-
-            {/* Zero Diagnostic Insight Animated Scanner */}
-            <div
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 800,
-                color: "var(--color-status-red)",
-                backgroundColor: "rgba(239, 68, 68, 0.12)",
-                padding: "0.4rem 0.9rem",
-                borderRadius: "var(--radius-full)",
-                border: "1px solid var(--color-status-red)",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <span style={{ animation: "pulseGlow 1.5s infinite" }}>●</span>
-              <span>ZERO DIAGNOSTIC INSIGHT</span>
-            </div>
           </div>
 
-          {/* CNM Interactive Test Autopsy Console */}
-          <div
-            style={{
-              backgroundColor: "rgba(14, 14, 18, 0.95)",
-              border: "2px solid var(--color-border-gold)",
-              borderRadius: "var(--radius-lg)",
-              padding: "2rem",
-              backdropFilter: "blur(12px)",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 55, 0.15)",
-              position: "relative",
-              overflow: "hidden",
-              transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease",
-              opacity: inView ? 1 : 0,
-              filter: inView ? "blur(0px)" : "blur(8px)",
-              transform: inView ? "translateY(0)" : "translateY(30px)",
-            }}
-          >
-            {/* Forensic Scan Line Overlay */}
-            <div className="autopsy-scan-beam" />
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingBottom: "1rem",
-                marginBottom: "1.25rem",
-                borderBottom: "1px solid var(--color-border-gold)",
-              }}
-            >
-              <div>
-                <span style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-gold-bright)" }}>
-                  CNM SYSTEM LABS • TEST AUTOPSY
-                </span>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginTop: "2px" }}>
-                  122 MARKS <span style={{ fontSize: "0.85rem", color: "var(--color-text-secondary)", fontWeight: 400 }}>(31 Inefficient Questions)</span>
-                </h3>
-              </div>
-              <span
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  color: "var(--color-status-green)",
-                  backgroundColor: "rgba(34, 197, 94, 0.12)",
-                  padding: "0.25rem 0.65rem",
-                  borderRadius: "4px",
-                  border: "1px solid var(--color-status-green)",
-                }}
-              >
-                ● AUTOPSY COMPLETE
-              </span>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "2.8rem", fontWeight: 900, color: "#f43f5e", lineHeight: 1, fontFamily: "monospace" }}>
+              {scoreVal} <span style={{ fontSize: "1.2rem", color: "var(--color-text-muted)" }}>/ 300</span>
             </div>
-
-            {/* Error Breakdown List with Hover Zoom */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {errorCategories.map((err, idx) => {
-                const isSelected = selectedCategory === idx;
-                const isHovered = hoveredErrorIdx === idx;
-
-                return (
-                  <div
-                    key={err.title}
-                    onClick={() => setSelectedCategory(idx)}
-                    onMouseEnter={() => setHoveredErrorIdx(idx)}
-                    onMouseLeave={() => setHoveredErrorIdx(null)}
-                    style={{
-                      backgroundColor: isSelected
-                        ? "rgba(240, 201, 75, 0.12)"
-                        : isHovered
-                        ? "rgba(20, 20, 25, 0.95)"
-                        : "rgba(10, 10, 12, 0.8)",
-                      border: isSelected
-                        ? `2px solid ${err.color}`
-                        : isHovered
-                        ? `1px solid ${err.color}`
-                        : "1px solid var(--color-border)",
-                      borderRadius: "var(--radius-sm)",
-                      padding: "0.85rem 1rem",
-                      cursor: "pointer",
-                      transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                      transform: isHovered ? "scale(1.03) translateX(4px)" : "scale(1)",
-                      boxShadow: isHovered ? `0 6px 20px ${err.color}25` : "none",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-                        <div
-                          style={{
-                            width: "34px",
-                            height: "34px",
-                            borderRadius: "6px",
-                            backgroundColor: `${err.color}15`,
-                            border: `1px solid ${err.color}40`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {err.icon}
-                        </div>
-                        <div>
-                          <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#ffffff" }}>{err.title}</span>
-                          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginLeft: "0.5rem" }}>
-                            ({err.desc})
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
-                        <span style={{ fontSize: "0.85rem", fontWeight: 800, color: err.color }}>
-                          {err.count} Questions
-                        </span>
-                        <span
-                          style={{
-                            fontSize: "0.7rem",
-                            fontWeight: 800,
-                            backgroundColor: `${err.color}20`,
-                            padding: "0.15rem 0.45rem",
-                            borderRadius: "3px",
-                            color: err.color,
-                          }}
-                        >
-                          {err.percentage}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Expanded Detail Panel when selected */}
-                    {isSelected && (
-                      <div
-                        style={{
-                          marginTop: "0.85rem",
-                          paddingTop: "0.75rem",
-                          borderTop: "1px solid var(--color-border-subtle)",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "0.5rem",
-                          fontSize: "0.82rem",
-                        }}
-                      >
-                        <div>
-                          <strong style={{ color: "var(--color-gold-bright)" }}>Observed Error Pattern: </strong>
-                          <span style={{ color: "var(--color-text-secondary)" }}>{err.pattern}</span>
-                        </div>
-                        <div>
-                          <strong style={{ color: "var(--color-status-green)" }}>Recommended Intervention: </strong>
-                          <span style={{ color: "var(--color-text)" }}>{err.intervention}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Bottom Prescription Strip */}
-            <div
-              style={{
-                marginTop: "1.25rem",
-                paddingTop: "1rem",
-                borderTop: "1px solid var(--color-border-subtle)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                fontSize: "0.78rem",
-              }}
-            >
-              <span style={{ color: "var(--color-text-secondary)" }}>Actionable Prescription:</span>
-              <span style={{ color: "var(--color-gold-bright)", fontWeight: 700 }}>
-                Focus on Concept Gap (9) & Misread Errors (7) for +24 Mark Gain
-              </span>
+            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#f43f5e", marginTop: "0.4rem", letterSpacing: "0.05em" }}>
+              ⚠️ 178 MARKS LOST TO LEAKS
             </div>
           </div>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
+        {/* Sequential Dissection Flow Arrow */}
+        <div style={{ textAlign: "center", margin: "2.5rem 0 2rem 0", color: "var(--color-gold-bright)", fontWeight: 800, fontSize: "0.85rem", letterSpacing: "0.1em" }}>
+          ↓ FORENSIC AUTOPSY DISSECTION ↓
+        </div>
+
+        {/* 4 Diagnostic Cards - Element-level Scroll Observer with 450ms Stagger Pause */}
+        <div
+          ref={cardsRef}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+          }}
+        >
+          {diagnosticCards.map((card, idx) => {
+            const isVisible = visibleCardsCount >= idx + 1;
+            const isHovered = hoveredCardIdx === idx;
+            const initialTransform = card.direction === "RIGHT" ? "translateX(60px)" : "translateX(-60px)";
+
+            return (
+              <div
+                key={card.num}
+                onMouseEnter={() => setHoveredCardIdx(idx)}
+                onMouseLeave={() => setHoveredCardIdx(null)}
+                style={{
+                  backgroundColor: isHovered ? "rgba(18, 20, 28, 0.96)" : "rgba(12, 14, 20, 0.92)",
+                  border: isHovered ? `1px solid ${card.color}` : "1px solid rgba(255, 255, 255, 0.08)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "1.75rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  gap: "1.25rem",
+                  position: "relative",
+                  boxShadow: isHovered ? `0 12px 35px ${card.color}25` : "0 10px 30px rgba(0, 0, 0, 0.6)",
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible
+                    ? isHovered
+                      ? "scale(1.03) translateY(-4px)"
+                      : "scale(1) translateX(0) translateY(0)"
+                    : `${initialTransform} translateY(15px)`,
+                  transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), border 0.3s ease, boxShadow 0.3s ease",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 800, color: card.color, fontFamily: "monospace" }}>
+                      CARD {card.num}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        color: card.color,
+                        backgroundColor: `${card.color}18`,
+                        border: `1px solid ${card.color}40`,
+                        padding: "0.2rem 0.55rem",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {card.impact}
+                    </span>
+                  </div>
+
+                  <h4 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#ffffff", margin: "0 0 0.4rem 0" }}>
+                    {card.title}
+                  </h4>
+                  <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--color-text-muted)", marginBottom: "1rem" }}>
+                    {card.count}
+                  </div>
+
+                  <div style={{ fontSize: "0.82rem", color: "var(--color-text-secondary)", lineHeight: 1.45, marginBottom: "0.85rem" }}>
+                    <strong>Root Cause:</strong> {card.pattern}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#ffffff",
+                      backgroundColor: "rgba(255, 255, 255, 0.03)",
+                      padding: "0.75rem",
+                      borderRadius: "var(--radius-sm)",
+                      borderLeft: `3px solid ${card.color}`,
+                    }}
+                  >
+                    <strong style={{ color: card.color }}>CNM Intervention:</strong> {card.fix}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    height: "2px",
+                    width: "100%",
+                    backgroundColor: isHovered ? card.color : "rgba(255, 255, 255, 0.05)",
+                    transition: "backgroundColor 0.3s ease",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom Callout */}
+        <div style={{ textAlign: "center", marginTop: "3.5rem" }}>
           <a
             href={AUDIT_URL}
             target="_blank"
             rel="noopener noreferrer"
+            className="btn-filled"
             style={{
               display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
               gap: "0.5rem",
+              padding: "0.95rem 2.25rem",
               backgroundColor: "var(--color-gold-bright)",
               color: "#050505",
               fontWeight: 800,
               fontSize: "0.95rem",
-              padding: "0.85rem 1.75rem",
               borderRadius: "var(--radius-md)",
               textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
-              transition: "all 0.2s ease",
+              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.4)",
             }}
           >
-            ANALYZE MY MOCK TEST PERFORMANCE →
+            AUTOPSY YOUR MOCK TEST RESULTS NOW →
           </a>
         </div>
       </div>
-
-      <style jsx>{`
-        .autopsy-scan-beam {
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 60%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.08), transparent);
-          animation: scanBeamMove 6s linear infinite;
-          pointer-events: none;
-        }
-
-        @keyframes scanBeamMove {
-          0% {
-            left: -100%;
-          }
-          100% {
-            left: 200%;
-          }
-        }
-
-        @media (min-width: 992px) {
-          .autopsy-grid {
-            grid-template-columns: 0.8fr 1.2fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
-

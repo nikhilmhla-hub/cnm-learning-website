@@ -2,79 +2,77 @@
 
 import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
-import Button from "../ui/Button";
 
 export default function DailyMissionSection() {
-  const [inView, setInView] = useState(false);
-  const [visibleCardCount, setVisibleCardCount] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
-  const sectionRef = useRef(null);
+  // Per-element scroll observers
+  const [col1Visible, setCol1Visible] = useState(false);
+  const [col2Visible, setCol2Visible] = useState(false);
+  const [col3Visible, setCol3Visible] = useState(false);
+  const [measureVisible, setMeasureVisible] = useState(false);
+
+  const col1Ref = useRef(null);
+  const col2Ref = useRef(null);
+  const col3Ref = useRef(null);
+  const measureRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const missions = [
-    {
-      num: "01",
-      topic: "Chemical Bonding",
-      action: "24 targeted problem-solving questions",
-      xp: "50 XP",
-      status: "COMPLETED",
-      time: "45 mins",
-    },
-    {
-      num: "02",
-      topic: "Thermodynamics",
-      action: "15-minute active-recall revision session",
-      xp: "40 XP",
-      status: "COMPLETED",
-      time: "15 mins",
-    },
-    {
-      num: "03",
-      topic: "Formula Recall",
-      action: "10-minute spaced repetition formula drill",
-      xp: "20 XP",
-      status: "COMPLETED",
-      time: "10 mins",
-    },
-  ];
-
-  // Scroll Entrance Observer
+  // Element-level Scroll Observers
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setInView(true);
-          observer.disconnect();
+    const obs1 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCol1Visible(true);
+          obs1.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
     );
+    if (col1Ref.current) obs1.observe(col1Ref.current);
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    const obs2 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCol2Visible(true);
+          obs2.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
+    );
+    if (col2Ref.current) obs2.observe(col2Ref.current);
 
-    return () => observer.disconnect();
+    const obs3 = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCol3Visible(true);
+          obs3.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
+    );
+    if (col3Ref.current) obs3.observe(col3Ref.current);
+
+    const obsM = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setMeasureVisible(true);
+          obsM.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.15 }
+    );
+    if (measureRef.current) obsM.observe(measureRef.current);
+
+    return () => {
+      obs1.disconnect();
+      obs2.disconnect();
+      obs3.disconnect();
+      obsM.disconnect();
+    };
   }, []);
 
-  // Sequential Stagger Card Reveal
-  useEffect(() => {
-    if (!inView) return;
-
-    let count = 0;
-    const interval = setInterval(() => {
-      count += 1;
-      setVisibleCardCount(count);
-      if (count >= missions.length) {
-        clearInterval(interval);
-      }
-    }, 220);
-
-    return () => clearInterval(interval);
-  }, [inView, missions.length]);
-
-  // Live Execution Canvas Visual System (Performance Diagnostic network language)
+  // Full-Section Live Background Canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -94,42 +92,39 @@ export default function DailyMissionSection() {
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Execution signal tracks
-    const signalTracks = Array.from({ length: 4 }, (_, i) => ({
-      y: (height / 5) * (i + 1),
-      speed: 0.5 + Math.random() * 0.4,
-      amplitude: 10 + Math.random() * 15,
-      wavelength: 0.006 + Math.random() * 0.004,
-      offset: Math.random() * Math.PI * 2,
+    const tracks = Array.from({ length: 3 }, (_, i) => ({
+      y: (height / 4) * (i + 1),
+      speed: 0.003 + i * 0.001,
+      phase: i * Math.PI * 0.5,
     }));
-
-    // Floating telemetry data packets
-    const packets = Array.from({ length: 14 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      size: Math.random() * 2 + 1,
-      opacity: Math.random() * 0.35 + 0.15,
-      isGold: Math.random() > 0.4,
-    }));
-
-    let pulse = 0;
 
     const render = () => {
+      if (document.hidden) return;
       ctx.clearRect(0, 0, width, height);
 
-      // Subtle Background Grid
-      ctx.strokeStyle = "rgba(212, 175, 55, 0.025)";
+      const bgGrad = ctx.createRadialGradient(
+        width * 0.5,
+        height * 0.5,
+        30,
+        width * 0.5,
+        height * 0.5,
+        width * 0.8
+      );
+      bgGrad.addColorStop(0, "rgba(8, 10, 14, 0.4)");
+      bgGrad.addColorStop(1, "#050505");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = "rgba(212, 175, 55, 0.02)";
       ctx.lineWidth = 1;
-      const gridStep = 70;
-      for (let x = 0; x < width; x += gridStep) {
+      const step = 75;
+      for (let x = 0; x < width; x += step) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
-      for (let y = 0; y < height; y += gridStep) {
+      for (let y = 0; y < height; y += step) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
@@ -137,36 +132,17 @@ export default function DailyMissionSection() {
       }
 
       if (!prefersReducedMotion) {
-        pulse += 0.012;
-
-        // Render Waveform Signals
-        signalTracks.forEach((track) => {
+        tracks.forEach((tr) => {
+          tr.phase += tr.speed;
           ctx.beginPath();
-          ctx.strokeStyle = "rgba(56, 189, 248, 0.06)";
-          ctx.lineWidth = 1.2;
-          for (let x = 0; x < width; x += 12) {
-            const y = track.y + Math.sin(x * track.wavelength + track.offset + pulse * track.speed) * track.amplitude;
-            if (x === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+          ctx.moveTo(0, tr.y);
+          for (let x = 0; x < width; x += 15) {
+            const dy = Math.sin(x * 0.008 + tr.phase) * 12;
+            ctx.lineTo(x, tr.y + dy);
           }
+          ctx.strokeStyle = "rgba(56, 189, 248, 0.05)";
+          ctx.lineWidth = 1;
           ctx.stroke();
-        });
-
-        // Render Telemetry Packets
-        packets.forEach((p) => {
-          p.x += p.vx;
-          p.y += p.vy;
-          if (p.x < 0) p.x = width;
-          if (p.x > width) p.x = 0;
-          if (p.y < 0) p.y = height;
-          if (p.y > height) p.y = 0;
-
-          ctx.beginPath();
-          ctx.fillStyle = p.isGold
-            ? `rgba(212, 175, 55, ${p.opacity})`
-            : `rgba(56, 189, 248, ${p.opacity})`;
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
         });
       }
 
@@ -181,241 +157,310 @@ export default function DailyMissionSection() {
     };
   }, []);
 
+  const todayActions = [
+    { num: "01", title: "25-Minute Deep Focus Block", sub: "Eliminate context switching friction", xp: "+50 XP" },
+    { num: "02", title: "10-Question Accuracy Drill", sub: "Focused on misread keyword avoidance", xp: "+40 XP" },
+    { num: "03", title: "15-Minute Error Review", sub: "Autopsy yesterday's calculation slips", xp: "+30 XP" },
+    { num: "04", title: "Timed Problem Set", sub: "Simulated exam time pressure solving", xp: "+60 XP" },
+    { num: "05", title: "End-of-Day Performance Check", sub: "Auto-recalibrate tomorrow's protocol", xp: "+20 XP" },
+  ];
+
+  const AUDIT_URL = "https://cnm-online-audit.vercel.app/";
+
   return (
     <section
       id="daily-mission"
-      ref={sectionRef}
       style={{
-        position: "relative",
-        padding: "5.5rem 0",
+        padding: "6rem 0",
         backgroundColor: "var(--color-background-alt)",
         borderBottom: "1px solid var(--color-border-subtle)",
+        position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Live Execution Engine Canvas Layer */}
+      {/* Full-Section Live Background Canvas */}
       <canvas
         ref={canvasRef}
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
+          inset: 0,
           width: "100%",
           height: "100%",
           pointerEvents: "none",
-          zIndex: 0,
+          zIndex: 1,
         }}
       />
 
-      <div className="container" style={{ position: "relative", zIndex: 1 }}>
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <SectionHeading
           eyebrow="DAILY EXECUTION ENGINE"
-          title="Stop Asking: 'What Should I Study Today?' Start Knowing."
-          description="The CNM Daily Mission Panel converts your long-term rank strategy into today's exact, friction-free actions."
+          title="From Diagnosis to Action: How CNM Powers Your Day"
+          description="CNM takes a diagnosed student problem and automatically converts it into specific, measurable daily execution actions."
           center={true}
         />
 
-        {/* Mission Panel UI Mockup Container (Fixed, non-scaling wrapper) */}
+        {/* 3-Column Visual Transformation Pipeline - Per-Element Scroll Observers */}
         <div
           style={{
-            maxWidth: "850px",
-            margin: "3rem auto 0 auto",
-            backgroundColor: "var(--color-surface)",
-            border: "1px solid var(--color-border-gold)",
-            borderRadius: "var(--radius-lg)",
-            padding: "2rem",
-            boxShadow: "0 20px 50px rgba(0, 0, 0, 0.9)",
-            transform: "none", // Ensures parent container remains completely fixed
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "2rem",
+            marginTop: "3.5rem",
+            alignItems: "stretch",
           }}
         >
-          {/* Top Panel Strip */}
+          {/* COLUMN 1: STUDENT DIAGNOSIS (LEFT) */}
           <div
+            ref={col1Ref}
             style={{
+              backgroundColor: "rgba(14, 14, 18, 0.94)",
+              border: "1px solid rgba(244, 63, 94, 0.35)",
+              borderRadius: "var(--radius-lg)",
+              padding: "2rem",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
               justifyContent: "space-between",
-              paddingBottom: "1.25rem",
-              marginBottom: "1.5rem",
-              borderBottom: "1px solid var(--color-border-subtle)",
-              flexWrap: "wrap",
-              gap: "1rem",
+              backdropFilter: "blur(10px)",
+              opacity: col1Visible ? 1 : 0,
+              transform: col1Visible ? "translateX(0) scale(1)" : "translateX(-60px) scale(0.97)",
+              transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <span
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "50%",
-                  backgroundColor: "var(--color-status-green)",
-                  boxShadow: "0 0 10px var(--color-status-green)",
-                  animation: "pulseGlow 2s infinite ease-in-out",
-                }}
-              />
-              <div>
-                <div style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-text-muted)" }}>
-                  TODAY'S MISSION CONTROL
+            <div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+                <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#f43f5e", letterSpacing: "0.12em" }}>
+                  STAGE 01 // DIAGNOSIS
+                </span>
+                <span style={{ fontSize: "0.65rem", color: "#f43f5e", backgroundColor: "rgba(244, 63, 94, 0.12)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                  INPUT PROBLEM
+                </span>
+              </div>
+
+              <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#ffffff", marginBottom: "1rem" }}>
+                Student Telemetry Scan
+              </h3>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ backgroundColor: "rgba(244, 63, 94, 0.1)", border: "1px solid rgba(244, 63, 94, 0.3)", padding: "0.85rem", borderRadius: "var(--radius-md)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: 700, color: "#ffffff" }}>
+                    <span>Focus Endurance</span>
+                    <span style={{ color: "#f43f5e" }}>38% [CRITICAL LEAK]</span>
+                  </div>
+                  <div style={{ height: "4px", backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "2px", marginTop: "0.5rem" }}>
+                    <div style={{ width: "38%", height: "100%", backgroundColor: "#f43f5e", borderRadius: "2px" }} />
+                  </div>
                 </div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "#ffffff" }}>
-                  Active Execution Protocol
+
+                <div style={{ backgroundColor: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", padding: "0.85rem", borderRadius: "var(--radius-md)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: 700, color: "#ffffff" }}>
+                    <span>Solving Accuracy</span>
+                    <span style={{ color: "#f59e0b" }}>50% [NEEDS ATTENTION]</span>
+                  </div>
+                  <div style={{ height: "4px", backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "2px", marginTop: "0.5rem" }}>
+                    <div style={{ width: "50%", height: "100%", backgroundColor: "#f59e0b", borderRadius: "2px" }} />
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: "rgba(56, 189, 248, 0.08)", border: "1px solid rgba(56, 189, 248, 0.25)", padding: "0.85rem", borderRadius: "var(--radius-md)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: 700, color: "#ffffff" }}>
+                    <span>Time Management</span>
+                    <span style={{ color: "#38bdf8" }}>68% [FAIR]</span>
+                  </div>
+                  <div style={{ height: "4px", backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "2px", marginTop: "0.5rem" }}>
+                    <div style={{ width: "68%", height: "100%", backgroundColor: "#38bdf8", borderRadius: "2px" }} />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Completion Pill */}
-            <div
-              style={{
-                backgroundColor: "rgba(34, 197, 94, 0.12)",
-                border: "1px solid var(--color-status-green)",
-                padding: "0.4rem 1rem",
-                borderRadius: "var(--radius-full)",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--color-status-green)" }}>
-                3 / 3 MISSIONS COMPLETED
-              </span>
-              <span style={{ color: "var(--color-status-green)" }}>✓</span>
+            <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "1.5rem", fontStyle: "italic" }}>
+              Identified Root Cause: Low focus endurance drains accuracy in the 2nd hour of tests.
             </div>
           </div>
 
-          {/* Mission Cards Stack */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {missions.map((m, idx) => {
-              const isVisible = idx < visibleCardCount;
-              const isHovered = hoveredIdx === idx;
-              const direction = idx % 2 === 0 ? "-16px" : "16px";
-
-              return (
-                <div
-                  key={m.num}
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                  style={{
-                    backgroundColor: isHovered
-                      ? "rgba(18, 18, 24, 0.95)"
-                      : "rgba(10, 10, 12, 0.8)",
-                    border: isHovered
-                      ? "1px solid var(--color-gold-bright)"
-                      : "1px solid var(--color-border-gold)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "1.25rem 1.5rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "1rem",
-                    flexWrap: "wrap",
-                    opacity: isVisible ? 1 : 0,
-                    transform: isVisible
-                      ? isHovered
-                        ? "scale(1.03) translateY(-2px)"
-                        : "scale(1) translateY(0)"
-                      : `translateX(${direction}) translateY(12px)`,
-                    boxShadow: isHovered
-                      ? "0 10px 30px rgba(212, 175, 55, 0.18)"
-                      : "0 4px 12px rgba(0,0,0,0.4)",
-                    transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
-                    transformOrigin: "center center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                    <span
-                      style={{
-                        fontSize: "1.1rem",
-                        fontWeight: 800,
-                        color: "var(--color-gold-bright)",
-                        backgroundColor: isHovered
-                          ? "rgba(212, 175, 55, 0.25)"
-                          : "var(--color-gold-soft)",
-                        width: "42px",
-                        height: "42px",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        transition: "background-color 0.3s ease, transform 0.3s ease",
-                        transform: isHovered ? "scale(1.08)" : "scale(1)",
-                      }}
-                    >
-                      {m.num}
-                    </span>
-                    <div>
-                      <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#ffffff" }}>
-                        {m.topic}
-                      </div>
-                      <div style={{ fontSize: "0.85rem", color: "var(--color-text-secondary)", marginTop: "2px" }}>
-                        {m.action} • <span style={{ color: "var(--color-text-muted)" }}>Est. {m.time}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: 800,
-                        color: "var(--color-gold-bright)",
-                        backgroundColor: "rgba(255, 255, 255, 0.04)",
-                        padding: "0.3rem 0.65rem",
-                        borderRadius: "4px",
-                        border: "1px solid var(--color-border-gold)",
-                      }}
-                    >
-                      +{m.xp}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.72rem",
-                        fontWeight: 800,
-                        color: "var(--color-status-green)",
-                        backgroundColor: "rgba(34, 197, 94, 0.12)",
-                        padding: "0.3rem 0.65rem",
-                        borderRadius: "4px",
-                        border: "1px solid var(--color-status-green)",
-                        boxShadow: isHovered ? "0 0 10px rgba(34, 197, 94, 0.3)" : "none",
-                        transition: "box-shadow 0.3s ease",
-                      }}
-                    >
-                      ✓ {m.status}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Daily XP Summary Strip */}
+          {/* COLUMN 2: CNM DECISION ENGINE (CENTER) */}
           <div
+            ref={col2Ref}
             style={{
-              marginTop: "1.5rem",
-              paddingTop: "1.25rem",
-              borderTop: "1px solid var(--color-border-subtle)",
+              backgroundColor: "rgba(10, 14, 20, 0.94)",
+              border: "1px solid var(--color-border-gold)",
+              borderRadius: "var(--radius-lg)",
+              padding: "2rem",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
               justifyContent: "space-between",
-              fontSize: "0.82rem",
-              flexWrap: "wrap",
-              gap: "0.5rem",
+              backdropFilter: "blur(10px)",
+              opacity: col2Visible ? 1 : 0,
+              transform: col2Visible ? "translateY(0) scale(1)" : "translateY(30px) scale(0.95)",
+              transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)",
+              boxShadow: col2Visible ? "0 0 30px rgba(212, 175, 55, 0.25)" : "none",
             }}
           >
-            <span style={{ color: "var(--color-text-secondary)" }}>Total Daily Execution Yield:</span>
-            <span style={{ color: "var(--color-gold-bright)", fontWeight: 800 }}>
-              110 XP • 100% Target Met
-            </span>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+                <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--color-gold-bright)", letterSpacing: "0.12em" }}>
+                  STAGE 02 // DECISION ENGINE
+                </span>
+                <span style={{ fontSize: "0.65rem", color: "var(--color-gold-bright)", backgroundColor: "rgba(212, 175, 55, 0.12)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                  CNM LOGIC
+                </span>
+              </div>
+
+              <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#ffffff", marginBottom: "1rem" }}>
+                Priority Isolation
+              </h3>
+
+              <div
+                style={{
+                  backgroundColor: "rgba(212, 175, 55, 0.12)",
+                  border: "1px solid var(--color-border-gold)",
+                  padding: "1.25rem",
+                  borderRadius: "var(--radius-md)",
+                  marginBottom: "1.5rem",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--color-gold-bright)", letterSpacing: "0.1em" }}>
+                  PRIMARY LEAK IDENTIFIED
+                </div>
+                <div style={{ fontSize: "1.5rem", fontWeight: 900, color: "#ffffff", marginTop: "0.3rem" }}>
+                  FOCUS LEAK (38%)
+                </div>
+                <div style={{ fontSize: "0.78rem", color: "var(--color-text-secondary)", marginTop: "0.4rem" }}>
+                  Requires targeted 25-min focus blocks & active recall recovery
+                </div>
+              </div>
+
+              <div style={{ textAlign: "center", color: "var(--color-gold-bright)", fontWeight: 800, fontSize: "1.2rem" }}>
+                ⚡ CONVERTING TO PROTOCOL →
+              </div>
+            </div>
+
+            <div style={{ fontSize: "0.75rem", color: "var(--color-gold-bright)", fontWeight: 700, textAlign: "center", marginTop: "1.5rem" }}>
+              Zero decision friction for the student
+            </div>
+          </div>
+
+          {/* COLUMN 3: TODAY'S EXECUTION PLAN (RIGHT) */}
+          <div
+            ref={col3Ref}
+            style={{
+              backgroundColor: "rgba(10, 14, 18, 0.94)",
+              border: "1px solid var(--color-border-gold)",
+              borderRadius: "var(--radius-lg)",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              backdropFilter: "blur(10px)",
+              opacity: col3Visible ? 1 : 0,
+              transform: col3Visible ? "translateX(0) scale(1)" : "translateX(60px) scale(0.97)",
+              transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+                <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--color-status-green)", letterSpacing: "0.12em" }}>
+                  STAGE 03 // TODAY'S ACTIONS
+                </span>
+                <span style={{ fontSize: "0.65rem", color: "var(--color-status-green)", backgroundColor: "rgba(34, 197, 94, 0.12)", padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                  5 MISSIONS
+                </span>
+              </div>
+
+              <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "#ffffff", marginBottom: "1rem" }}>
+                Generated Execution Plan
+              </h3>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+                {todayActions.map((act, idx) => (
+                  <div
+                    key={act.num}
+                    style={{
+                      padding: "0.7rem 0.85rem",
+                      backgroundColor: col3Visible ? "rgba(34, 197, 94, 0.1)" : "rgba(255, 255, 255, 0.03)",
+                      border: col3Visible ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(255, 255, 255, 0.05)",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      opacity: col3Visible ? 1 : 0.3,
+                      transition: `all 0.3s ease ${idx * 100}ms`,
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: col3Visible ? "#ffffff" : "var(--color-text-muted)" }}>
+                        {act.num}. {act.title}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)" }}>
+                        {act.sub}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--color-gold-bright)", fontFamily: "monospace" }}>
+                      {act.xp}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ fontSize: "0.75rem", color: "var(--color-status-green)", fontWeight: 700, marginTop: "1.5rem" }}>
+              ✓ Complete today to lock focus recovery
+            </div>
           </div>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
-          <Button href="#control-room" variant="primary" style={{ padding: "0.85rem 1.75rem" }}>
-            SEE HOW DAILY MISSIONS ADAPT TO YOU →
-          </Button>
+        {/* STAGE 4: MEASUREMENT INDICATORS (BOTTOM FADE UP ON SCROLL REACH) */}
+        <div
+          ref={measureRef}
+          style={{
+            marginTop: "2.5rem",
+            backgroundColor: "rgba(10, 12, 16, 0.95)",
+            border: "1px solid var(--color-border-gold)",
+            borderRadius: "var(--radius-lg)",
+            padding: "1.5rem 2rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "1.5rem",
+            opacity: measureVisible ? 1 : 0,
+            transform: measureVisible ? "translateY(0)" : "translateY(25px)",
+            transition: "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <span style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "var(--color-status-green)", boxShadow: "0 0 10px var(--color-status-green)" }} />
+            <div>
+              <div style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.1em", color: "var(--color-status-green)" }}>
+                STAGE 04 // MEASURED RESULT
+              </div>
+              <div style={{ fontSize: "1rem", fontWeight: 800, color: "#ffffff" }}>
+                Focus Session: COMPLETED | Accuracy: IMPROVING (+12%) | Execution: TRACKED
+              </div>
+            </div>
+          </div>
+
+          <a
+            href={AUDIT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-filled"
+            style={{
+              padding: "0.75rem 1.5rem",
+              backgroundColor: "var(--color-gold-bright)",
+              color: "#050505",
+              fontWeight: 800,
+              fontSize: "0.88rem",
+              borderRadius: "var(--radius-md)",
+              textDecoration: "none",
+              boxShadow: "0 4px 15px rgba(212, 175, 55, 0.3)",
+            }}
+          >
+            GET YOUR DAILY EXECUTION PLAN →
+          </a>
         </div>
       </div>
     </section>
   );
 }
-

@@ -17,7 +17,6 @@ import StudentTypesSection from "./components/sections/StudentTypesSection";
 import ParentsSection from "./components/sections/ParentsSection";
 import InstitutionsSection from "./components/sections/InstitutionsSection";
 import FeedbackLoopSection from "./components/sections/FeedbackLoopSection";
-import EvidenceSection from "./components/sections/EvidenceSection";
 import FAQSection from "./components/sections/FAQSection";
 import FinalCTASection from "./components/sections/FinalCTASection";
 
@@ -42,7 +41,6 @@ export default function Home() {
         <ParentsSection />
         <InstitutionsSection />
         <FeedbackLoopSection />
-        <EvidenceSection />
         <FAQSection />
         <FinalCTASection />
       </main>

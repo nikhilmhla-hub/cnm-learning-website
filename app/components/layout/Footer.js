@@ -164,11 +164,26 @@ export default function Footer() {
           transform: translateY(0);
         }
 
+        .footer-col ul li a {
+          display: inline-block;
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease, text-shadow 0.25s ease;
+          text-decoration: none;
+        }
+
+        .footer-col ul li a:hover {
+          color: var(--color-gold-bright) !important;
+          transform: translateX(5px);
+          text-shadow: 0 0 12px rgba(212, 175, 55, 0.45);
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .footer-col {
             opacity: 1 !important;
             transform: none !important;
             transition: none !important;
+          }
+          .footer-col ul li a:hover {
+            transform: none !important;
           }
         }
       `}</style>

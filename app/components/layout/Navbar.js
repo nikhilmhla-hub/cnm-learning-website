@@ -107,19 +107,12 @@ export default function Navbar() {
             href="https://cnm-online-audit.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
+            className="btn btn-primary"
             style={{
-              backgroundColor: "var(--color-gold-bright)",
-              color: "#050505",
               fontWeight: 700,
               fontSize: "0.82rem",
               padding: "0.55rem 1.15rem",
-              borderRadius: "var(--radius-sm)",
               textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.4rem",
-              boxShadow: "0 2px 10px rgba(212, 175, 55, 0.3)",
-              transition: "all 0.2s ease",
             }}
           >
             Run Performance Audit →

@@ -1,19 +1,154 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
-import Button from "../ui/Button";
+import ParentsVisibilityBackground from "../ui/ParentsVisibilityBackground";
+
+function FadeInItem({ children, delay = 0, direction = "up", style = {} }) {
+  const [inView, setInView] = useState(false);
+  const domRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const getTransform = () => {
+    if (inView) return "translateX(0) translateY(0) scale(1)";
+    if (direction === "left") return "translateX(-40px) translateY(15px) scale(0.97)";
+    if (direction === "right") return "translateX(40px) translateY(15px) scale(0.97)";
+    return "translateY(24px) scale(0.97)";
+  };
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: getTransform(),
+        transition: `opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, border-color 0.3s ease, box-shadow 0.3s ease`,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function MetricCounterCard({ label, targetVal, color, isHighlight, delay, direction }) {
+  const [count, setCount] = useState(0);
+  const [inView, setInView] = useState(false);
+  const domRef = useRef(null);
+
+  const numTarget = parseInt(targetVal, 10) || 0;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
+
+    let start = 0;
+    const duration = 1500; // 1.5s smooth count-up
+    const stepTime = 30;
+    const steps = duration / stepTime;
+    const increment = numTarget / steps;
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= numTarget) {
+        setCount(numTarget);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [inView, numTarget]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView
+          ? "translateX(0) translateY(0) scale(1)"
+          : direction === "left"
+          ? "translateX(-40px) translateY(15px) scale(0.97)"
+          : "translateX(40px) translateY(15px) scale(0.97)",
+        transition: `opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, border-color 0.3s ease, box-shadow 0.3s ease`,
+        backgroundColor: "rgba(10,10,12,0.85)",
+        border: isHighlight ? "1px solid var(--color-border-gold-bright)" : "1px solid var(--color-border)",
+        padding: "1rem",
+        borderRadius: "var(--radius-md)",
+      }}
+    >
+      <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)", fontWeight: 700, letterSpacing: "0.08em" }}>{label}</div>
+      <div style={{ fontSize: "1.3rem", fontWeight: 800, color }}>{count}%</div>
+    </div>
+  );
+}
 
 export default function ParentsSection() {
+  const traditionalItems = [
+    "“Marks are low in Physics.”",
+    "“Tell your child to study more hours.”",
+    "“Need more focus and concentration.”",
+    "“Why aren't you studying continuously?”",
+    "“You just need to revise everything again.”",
+  ];
+
+  const metrics = [
+    { label: "FOCUS ENDURANCE", val: "78%", color: "var(--color-gold-bright)", isHighlight: true },
+    { label: "REVISION RETENTION", val: "82%", color: "var(--color-status-green)", isHighlight: false },
+    { label: "SOLVING ACCURACY", val: "71%", color: "var(--color-status-amber)", isHighlight: false },
+    { label: "DAILY CONSISTENCY", val: "86%", color: "var(--color-status-green)", isHighlight: false },
+  ];
+
   return (
     <section
       id="for-parents"
       style={{
-        padding: "5.5rem 0",
+        padding: "6rem 0",
         backgroundColor: "var(--color-background-alt)",
         borderBottom: "1px solid var(--color-border-subtle)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div className="container">
+      {/* Performance Visibility Radar Live Background */}
+      <ParentsVisibilityBackground />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <SectionHeading
           eyebrow="PARENTAL VISIBILITY INTELLIGENCE"
           title="Parents Don't Need Another Marks Report. They Need to Know What Is Actually Happening."
@@ -32,147 +167,154 @@ export default function ParentsSection() {
           className="parents-grid"
         >
           {/* LEFT: What Parents Currently Hear */}
-          <div
-            style={{
-              backgroundColor: "rgba(10, 10, 12, 0.6)",
-              border: "1px solid var(--color-border-subtle)",
-              borderRadius: "var(--radius-lg)",
-              padding: "2rem",
-              opacity: 0.85,
-            }}
-          >
+          <FadeInItem delay={0.1} direction="left">
             <div
               style={{
-                fontSize: "0.72rem",
-                fontWeight: 800,
-                letterSpacing: "0.12em",
-                color: "var(--color-status-red)",
-                marginBottom: "0.5rem",
+                backgroundColor: "rgba(16, 12, 14, 0.85)",
+                border: "1px solid rgba(244, 63, 94, 0.3)",
+                borderRadius: "var(--radius-lg)",
+                padding: "2.2rem",
+                backdropFilter: "blur(6px)",
+                height: "100%",
+                boxSizing: "border-box",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(244, 63, 94, 0.05)",
               }}
             >
-              TRADITIONAL VAGUE REPORTING
-            </div>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "1.25rem" }}>
-              What Parents Currently Experience
-            </h3>
+              <div
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  color: "#f43f5e",
+                  marginBottom: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                }}
+              >
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#f43f5e", boxShadow: "0 0 6px #f43f5e" }} />
+                TRADITIONAL VAGUE REPORTING
+              </div>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "1.25rem" }}>
+                What Parents Currently Experience
+              </h3>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-              {[
-                "“Marks are low in Physics.”",
-                "“Tell your child to study more hours.”",
-                "“Need more focus and concentration.”",
-                "“Why aren't you studying continuously?”",
-                "“You just need to revise everything again.”",
-              ].map((item) => (
-                <div
-                  key={item}
-                  style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.02)",
-                    border: "1px solid rgba(255, 255, 255, 0.05)",
-                    borderRadius: "var(--radius-sm)",
-                    padding: "0.85rem 1rem",
-                    fontSize: "0.9rem",
-                    color: "var(--color-text-muted)",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {item}
-                </div>
-              ))}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                {traditionalItems.map((item, idx) => (
+                  <FadeInItem key={item} delay={0.2 + idx * 0.25} direction="left">
+                    <div
+                      style={{
+                        backgroundColor: "rgba(244, 63, 94, 0.06)",
+                        border: "1px solid rgba(244, 63, 94, 0.2)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "0.85rem 1rem",
+                        fontSize: "0.92rem",
+                        color: "#e2e8f0",
+                        fontWeight: 500,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                      }}
+                    >
+                      <span style={{ color: "#f43f5e", fontWeight: 800 }}>✕</span>
+                      <span>{item}</span>
+                    </div>
+                  </FadeInItem>
+                ))}
+              </div>
             </div>
-          </div>
+          </FadeInItem>
 
           {/* RIGHT: What CNM System Labs Provides */}
-          <div
-            style={{
-              backgroundColor: "var(--color-surface)",
-              border: "2px solid var(--color-border-gold)",
-              borderRadius: "var(--radius-lg)",
-              padding: "2rem",
-              boxShadow: "0 20px 50px rgba(0,0,0,0.9)",
-            }}
-          >
+          <FadeInItem delay={0.25} direction="right">
             <div
               style={{
-                fontSize: "0.72rem",
-                fontWeight: 800,
-                letterSpacing: "0.12em",
-                color: "var(--color-gold-bright)",
-                marginBottom: "0.5rem",
+                backgroundColor: "rgba(16, 16, 22, 0.9)",
+                border: "2px solid var(--color-border-gold)",
+                borderRadius: "var(--radius-lg)",
+                padding: "2.2rem",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(212, 175, 55, 0.12)",
+                backdropFilter: "blur(8px)",
+                height: "100%",
+                boxSizing: "border-box",
               }}
             >
-              CNM OBSERVABLE TELEMETRY DASHBOARD
-            </div>
-            <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#ffffff", marginBottom: "1.25rem" }}>
-              Actionable Signals Provided to Parents
-            </h3>
+              <div
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  color: "var(--color-gold-bright)",
+                  marginBottom: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                }}
+              >
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "var(--color-gold-bright)" }} />
+                CNM OBSERVABLE TELEMETRY DASHBOARD
+              </div>
+              <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#ffffff", marginBottom: "1.25rem" }}>
+                Actionable Signals Provided to Parents
+              </h3>
 
-            {/* Telemetry Metric Badges */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "0.75rem",
-                marginBottom: "1.25rem",
-              }}
-            >
-              <div style={{ backgroundColor: "rgba(10,10,12,0.8)", border: "1px solid var(--color-border)", padding: "0.85rem", borderRadius: "var(--radius-sm)" }}>
-                <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)", fontWeight: 700 }}>FOCUS ENDURANCE</div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-gold-bright)" }}>78%</div>
+              {/* Telemetry Metric Badges with Smooth Animated Number Counter */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "0.85rem",
+                  marginBottom: "1.25rem",
+                }}
+              >
+                {metrics.map((m, idx) => (
+                  <MetricCounterCard
+                    key={m.label}
+                    label={m.label}
+                    targetVal={m.val}
+                    color={m.color}
+                    isHighlight={m.isHighlight}
+                    delay={0.35 + idx * 0.35}
+                    direction={idx % 2 === 0 ? "left" : "right"}
+                  />
+                ))}
               </div>
-              <div style={{ backgroundColor: "rgba(10,10,12,0.8)", border: "1px solid var(--color-border)", padding: "0.85rem", borderRadius: "var(--radius-sm)" }}>
-                <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)", fontWeight: 700 }}>REVISION RETENTION</div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-status-green)" }}>82%</div>
-              </div>
-              <div style={{ backgroundColor: "rgba(10,10,12,0.8)", border: "1px solid var(--color-border)", padding: "0.85rem", borderRadius: "var(--radius-sm)" }}>
-                <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)", fontWeight: 700 }}>SOLVING ACCURACY</div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-status-amber)" }}>71%</div>
-              </div>
-              <div style={{ backgroundColor: "rgba(10,10,12,0.8)", border: "1px solid var(--color-border)", padding: "0.85rem", borderRadius: "var(--radius-sm)" }}>
-                <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)", fontWeight: 700 }}>DAILY CONSISTENCY</div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--color-status-green)" }}>86%</div>
-              </div>
-            </div>
 
-            {/* Current Active Intervention info */}
-            <div
-              style={{
-                backgroundColor: "var(--color-surface-gold)",
-                border: "1px solid var(--color-border-gold)",
-                borderRadius: "var(--radius-sm)",
-                padding: "1rem",
-                fontSize: "0.85rem",
-              }}
-            >
-              <div style={{ fontWeight: 800, color: "#ffffff" }}>
-                Current Priority Focus: <span style={{ color: "var(--color-gold-bright)" }}>Organic Chemistry Reaction Mechanisms</span>
-              </div>
-              <div style={{ color: "var(--color-text-secondary)", marginTop: "4px", fontSize: "0.8rem" }}>
-                Active Intervention: Targeted formula recall drills + 30-minute focus blocks to fix careless calculation errors.
-              </div>
+              {/* Current Active Intervention info */}
+              <FadeInItem delay={1.75} direction="up">
+                <div
+                  style={{
+                    backgroundColor: "rgba(212, 175, 55, 0.08)",
+                    border: "1px solid var(--color-border-gold)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "1.1rem",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  <div style={{ fontWeight: 800, color: "#ffffff", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ color: "var(--color-gold-bright)" }}>Active Priority:</span>
+                    <span>Organic Chemistry Reaction Mechanisms</span>
+                  </div>
+                  <div style={{ color: "var(--color-text-secondary)", marginTop: "6px", fontSize: "0.82rem", lineHeight: 1.45 }}>
+                    Telemetry Intervention: Formula recall drills + 30-minute focus blocks eliminating careless calculation errors.
+                  </div>
+                </div>
+              </FadeInItem>
             </div>
-          </div>
+          </FadeInItem>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "3rem" }}>
+        <div style={{ textAlign: "center", marginTop: "3.5rem" }}>
           <a
             href="https://cnm-online-audit.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
+            className="btn btn-primary"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              backgroundColor: "var(--color-gold-bright)",
-              color: "#050505",
+              padding: "0.95rem 2.2rem",
               fontWeight: 800,
               fontSize: "0.95rem",
-              padding: "0.85rem 1.75rem",
-              borderRadius: "var(--radius-md)",
               textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.35)",
-              transition: "all 0.2s ease",
             }}
           >
             UNDERSTAND MY STUDENT'S PERFORMANCE →

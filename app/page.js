@@ -19,6 +19,7 @@ import InstitutionsSection from "./components/sections/InstitutionsSection";
 import FeedbackLoopSection from "./components/sections/FeedbackLoopSection";
 import FAQSection from "./components/sections/FAQSection";
 import FinalCTASection from "./components/sections/FinalCTASection";
+import ContactSection from "./components/sections/ContactSection";
 
 export default function Home() {
   return (
@@ -43,6 +44,7 @@ export default function Home() {
         <FeedbackLoopSection />
         <FAQSection />
         <FinalCTASection />
+        <ContactSection />
       </main>
       <Footer />
     </div>

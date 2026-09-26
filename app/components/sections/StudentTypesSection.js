@@ -216,7 +216,7 @@ export default function StudentTypesSection() {
 
   return (
     <section
-      id="student-types"
+      id="for-students"
       style={{
         padding: "6rem 0",
         backgroundColor: "var(--color-background)",

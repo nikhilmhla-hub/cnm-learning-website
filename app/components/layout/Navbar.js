@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Button from "../ui/Button";
 
 export default function Navbar() {
@@ -17,14 +18,12 @@ export default function Navbar() {
   }, []);
 
   const navItems = [
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Performance Audit", href: "#audit" },
-    { label: "The System", href: "#control-room" },
-    { label: "For Students", href: "#for-students" },
-    { label: "For Parents", href: "#for-parents" },
-    { label: "For Institutions", href: "#for-institutions" },
-    { label: "Results", href: "#results" },
-    { label: "About CNM", href: "#about" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Courses", href: "/#control-room" },
+    { label: "For Students", href: "/#for-students" },
+    { label: "For Parents", href: "/#for-parents" },
+    { label: "For Institutions", href: "/#for-institutions" },
+    { label: "About CNM", href: "/about" },
   ];
 
   return (
@@ -40,8 +39,8 @@ export default function Navbar() {
         }}
       >
         {/* Brand Logo */}
-        <a
-          href="#home"
+        <Link
+          href="/"
           style={{
             display: "flex",
             alignItems: "center",
@@ -71,7 +70,7 @@ export default function Navbar() {
           <span>
             SYSTEM <span style={{ color: "var(--color-gold-bright)" }}>LABS</span>
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Navigation Links */}
         <nav
@@ -83,7 +82,7 @@ export default function Navbar() {
           }}
         >
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
               href={item.href}
               style={{
@@ -92,12 +91,13 @@ export default function Navbar() {
                 fontSize: "0.86rem",
                 transition: "color 0.2s ease",
                 whiteSpace: "nowrap",
+                textDecoration: "none",
               }}
               onMouseEnter={(e) => (e.target.style.color = "var(--color-gold-bright)")}
               onMouseLeave={(e) => (e.target.style.color = "var(--color-text-secondary)")}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -172,13 +172,13 @@ export default function Navbar() {
             padding: "1.5rem 1.5rem 2rem 1.5rem",
             display: "flex",
             flexDirection: "column",
-            gap: "1rem",
-            boxShadow: "0 16px 36px rgba(0, 0, 0, 0.95)",
+            gap: "1.1rem",
             zIndex: 99,
+            boxShadow: "0 20px 40px rgba(0,0,0,0.9)",
           }}
         >
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
               href={item.href}
               onClick={() => setMobileMenuOpen(false)}
@@ -186,49 +186,35 @@ export default function Navbar() {
                 color: "var(--color-text)",
                 fontSize: "1rem",
                 fontWeight: 600,
-                padding: "0.5rem 0",
+                textDecoration: "none",
+                padding: "0.4rem 0",
                 borderBottom: "1px solid var(--color-border-subtle)",
               }}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
+
           <a
             href="https://cnm-online-audit.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setMobileMenuOpen(false)}
+            className="btn btn-primary"
             style={{
-              width: "100%",
-              marginTop: "0.5rem",
-              padding: "0.85rem 1rem",
-              backgroundColor: "var(--color-gold-bright)",
-              color: "#050505",
+              padding: "0.85rem 1.5rem",
               fontWeight: 800,
               fontSize: "0.95rem",
-              borderRadius: "var(--radius-sm)",
               textAlign: "center",
+              justifyContent: "center",
+              marginTop: "0.5rem",
               textDecoration: "none",
-              display: "block",
             }}
           >
-            Run Performance Audit →
+            RUN PERFORMANCE AUDIT →
           </a>
         </div>
       )}
-
-      <style jsx>{`
-        @media (max-width: 1023px) {
-          :global(.desktop-nav),
-          :global(.desktop-cta) {
-            display: none !important;
-          }
-          :global(.mobile-menu-btn) {
-            display: flex !important;
-          }
-        }
-      `}</style>
     </header>
   );
 }
-

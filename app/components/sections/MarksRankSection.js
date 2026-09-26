@@ -127,7 +127,7 @@ export default function MarksRankSection() {
 
   return (
     <section
-      id="marks-rank"
+      id="results"
       style={{
         padding: "6rem 0",
         backgroundColor: "var(--color-background-alt)",

@@ -438,31 +438,6 @@ export default function MockTestAutopsySection() {
             );
           })}
         </div>
-
-        {/* Bottom Callout */}
-        <div style={{ textAlign: "center", marginTop: "3.5rem" }}>
-          <a
-            href={AUDIT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-filled"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.95rem 2.25rem",
-              backgroundColor: "var(--color-gold-bright)",
-              color: "#050505",
-              fontWeight: 800,
-              fontSize: "0.95rem",
-              borderRadius: "var(--radius-md)",
-              textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(212, 175, 55, 0.4)",
-            }}
-          >
-            AUTOPSY YOUR MOCK TEST RESULTS NOW →
-          </a>
-        </div>
       </div>
     </section>
   );

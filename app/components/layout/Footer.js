@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export default function Footer() {
   const footerRef = useRef(null);
@@ -93,9 +94,9 @@ export default function Footer() {
           </h5>
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.88rem" }}>
             <li><a href="https://cnm-online-audit.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-gold-bright)", fontWeight: 600 }}>Performance Audit →</a></li>
-            <li><a href="#control-room" style={{ color: "var(--color-text-secondary)" }}>Student System</a></li>
-            <li><a href="#results" style={{ color: "var(--color-text-secondary)" }}>Performance Tracking</a></li>
-            <li><a href="#how-it-works" style={{ color: "var(--color-text-secondary)" }}>Methodology</a></li>
+            <li><Link href="/#control-room" style={{ color: "var(--color-text-secondary)" }}>Student System</Link></li>
+            <li><Link href="/#results" style={{ color: "var(--color-text-secondary)" }}>Performance Tracking</Link></li>
+            <li><Link href="/#how-it-works" style={{ color: "var(--color-text-secondary)" }}>Methodology</Link></li>
           </ul>
         </div>
 
@@ -105,24 +106,23 @@ export default function Footer() {
             FOR
           </h5>
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.88rem" }}>
-            <li><a href="#for-students" style={{ color: "var(--color-text-secondary)" }}>Students</a></li>
-            <li><a href="#for-parents" style={{ color: "var(--color-text-secondary)" }}>Parents</a></li>
-            <li><a href="#for-institutions" style={{ color: "var(--color-text-secondary)" }}>Schools</a></li>
-            <li><a href="#for-institutions" style={{ color: "var(--color-text-secondary)" }}>Coaching Institutes</a></li>
+            <li><Link href="/#for-students" style={{ color: "var(--color-text-secondary)" }}>Students</Link></li>
+            <li><Link href="/#for-parents" style={{ color: "var(--color-text-secondary)" }}>Parents</Link></li>
+            <li><Link href="/#for-institutions" style={{ color: "var(--color-text-secondary)" }}>Schools / Coaching Institutes</Link></li>
           </ul>
         </div>
 
-        {/* CNM Info */}
+        {/* CNM Info / Routes */}
         <div className="footer-col" style={{ transitionDelay: isMounted && isVisible ? "400ms" : "0ms" }}>
           <h5 style={{ color: "#ffffff", marginBottom: "1rem", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            CNM
+            COMPANY
           </h5>
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.88rem" }}>
-            <li><a href="#about" style={{ color: "var(--color-text-secondary)" }}>About</a></li>
-            <li><a href="#audit" style={{ color: "var(--color-text-secondary)" }}>Contact</a></li>
-            <li><a href="#about" style={{ color: "var(--color-text-secondary)" }}>Support</a></li>
-            <li><a href="#about" style={{ color: "var(--color-text-secondary)" }}>Privacy Policy</a></li>
-            <li><a href="#about" style={{ color: "var(--color-text-secondary)" }}>Terms of Service</a></li>
+            <li><Link href="/about" style={{ color: "var(--color-text-secondary)" }}>About</Link></li>
+            <li><Link href="/#contact" style={{ color: "var(--color-text-secondary)" }}>Contact</Link></li>
+            <li><Link href="/support" style={{ color: "var(--color-text-secondary)" }}>Support</Link></li>
+            <li><Link href="/privacy-policy" style={{ color: "var(--color-text-secondary)" }}>Privacy Policy</Link></li>
+            <li><Link href="/terms-of-service" style={{ color: "var(--color-text-secondary)" }}>Terms of Service</Link></li>
           </ul>
         </div>
       </div>

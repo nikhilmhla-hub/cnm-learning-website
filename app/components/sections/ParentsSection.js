@@ -152,7 +152,7 @@ export default function ParentsSection() {
         <SectionHeading
           eyebrow="PARENTAL VISIBILITY INTELLIGENCE"
           title="Parents Don't Need Another Marks Report. They Need to Know What Is Actually Happening."
-          description="Transform vague academic concern into objective, observable study patterns and actionable intervention areas."
+          description="See what is being practised, where difficulties repeat and what needs attention next. The sample indicators below illustrate the view; they are not student results."
           center={true}
         />
 

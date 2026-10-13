@@ -54,7 +54,7 @@ export default function ContactSection() {
             backgroundColor: "rgba(16, 16, 22, 0.9)",
             border: "2px solid var(--color-border-gold)",
             borderRadius: "var(--radius-xl)",
-            padding: "2.8rem",
+            padding: "clamp(1rem, 4vw, 2.8rem)",
             boxShadow: "0 25px 60px rgba(0,0,0,0.9), 0 0 35px rgba(212, 175, 55, 0.12)",
             backdropFilter: "blur(10px)",
             opacity: inView ? 1 : 0,
@@ -65,13 +65,13 @@ export default function ContactSection() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
               gap: "1.75rem",
             }}
           >
             {/* Interactive Gmail Compose Card */}
             <a
-              href="https://mail.google.com/mail/?view=cm&fs=1&to=info@cnmlearning.com"
+              href="mailto:info@cnmlearning.com"
               target="_blank"
               rel="noopener noreferrer"
               onMouseEnter={() => setEmailHovered(true)}
@@ -110,7 +110,7 @@ export default function ContactSection() {
                 info@cnmlearning.com
               </div>
               <div style={{ fontSize: "0.82rem", color: emailHovered ? "var(--color-gold-bright)" : "var(--color-text-secondary)", transition: "color 0.3s ease" }}>
-                Click to open Gmail compose →
+                Send an email →
               </div>
             </a>
 

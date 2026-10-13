@@ -165,7 +165,7 @@ export default function AboutPage() {
       {/* Full Page Live Background */}
       <AboutLiveBackground />
 
-      <main style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
+      <main id="main-content" style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
         <div className="container">
           <SectionHeading
             eyebrow="ABOUT CNM SYSTEM LABS"

@@ -13,7 +13,10 @@ export default function Navbar() {
       }
     };
     window.addEventListener("resize", handleResize);
-    useEffect(() => {
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     if (!mobileMenuOpen) return;
     const handleEscape = (event) => {
       if (event.key === "Escape") {
@@ -24,9 +27,6 @@ export default function Navbar() {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [mobileMenuOpen]);
-
-  return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const navItems = [
     { label: "How It Works", href: "/#how-it-works" },

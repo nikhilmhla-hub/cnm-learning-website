@@ -1,5 +1,7 @@
 "use client";
 
+import { startCanvasAnimation } from "../ui/canvasAnimation";
+
 import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
@@ -101,7 +103,7 @@ export default function VisualLearningSection() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId;
+    let stopAnimation;
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
@@ -160,14 +162,14 @@ export default function VisualLearningSection() {
         });
       }
 
-      animationFrameId = requestAnimationFrame(render);
+
     };
 
-    render();
+    stopAnimation = startCanvasAnimation(canvas, render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation();
     };
   }, []);
 

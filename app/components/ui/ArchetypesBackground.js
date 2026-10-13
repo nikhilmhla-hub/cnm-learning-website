@@ -1,5 +1,7 @@
 "use client";
 
+import { startCanvasAnimation } from "./canvasAnimation";
+
 import { useEffect, useRef } from "react";
 
 export default function ArchetypesBackground() {
@@ -11,7 +13,7 @@ export default function ArchetypesBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId;
+    let stopAnimation;
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
@@ -123,14 +125,14 @@ export default function ArchetypesBackground() {
         ctx.fillRect(0, Math.max(0, scanY - 30), width, 30);
       }
 
-      animationFrameId = requestAnimationFrame(render);
+
     };
 
-    render();
+    stopAnimation = startCanvasAnimation(canvas, render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation();
     };
   }, []);
 

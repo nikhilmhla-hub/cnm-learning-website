@@ -3,12 +3,13 @@ export default function SectionHeading({
   title,
   description,
   centered = false,
+  center = false,
   className = "",
 }) {
   return (
     <div
       className={`section-header ${
-        centered ? "section-header-centered" : ""
+        (centered || center) ? "section-header-centered" : ""
       } ${className}`.trim()}
     >
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}

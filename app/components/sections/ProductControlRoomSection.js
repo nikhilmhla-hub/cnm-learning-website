@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import SectionHeading from "../ui/SectionHeading";
 import ProductSystemBackground from "../ui/ProductSystemBackground";
 
@@ -27,7 +28,9 @@ function ToolCard({ tool, idx, isSelected, onClick }) {
   }, []);
 
   return (
-    <div
+    <button
+      type="button"
+      aria-pressed={isSelected}
       ref={domRef}
       onClick={onClick}
       style={{
@@ -50,7 +53,7 @@ function ToolCard({ tool, idx, isSelected, onClick }) {
         boxShadow: isSelected ? "0 6px 20px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.2)" : "none",
         backdropFilter: "blur(6px)",
       }}
-      className="hover-card-illuminate"
+      className="hover-card-illuminate tool-choice"
       onMouseEnter={(e) => {
         if (!isSelected) {
           e.currentTarget.style.borderColor = "var(--color-border-gold)";
@@ -121,7 +124,7 @@ function ToolCard({ tool, idx, isSelected, onClick }) {
           →
         </span>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -314,7 +317,7 @@ export default function ProductControlRoomSection() {
         <SectionHeading
           eyebrow="PRODUCT SYSTEM ARCHITECTURE"
           title="Your Performance Has a Control Room."
-          description="Integrated tool control center engineered to eliminate performance leaks. Click any tool to preview its live telemetry interface."
+          description="Explore the tools students use to plan, practise and review. Select a tool to see its interface — these are product previews."
           center={true}
         />
 
@@ -470,10 +473,13 @@ export default function ProductControlRoomSection() {
                 border: "1px solid var(--color-border-subtle)",
               }}
             >
-              <img
+              <Image
                 key={`${activeSystem}-${selectedTool.title}`}
                 src={selectedTool.image}
-                alt={selectedTool.title}
+                alt={`${selectedTool.title} interface preview`}
+                width={1200}
+                height={800}
+                sizes="(max-width: 900px) 100vw, 650px"
                 style={{
                   width: "100%",
                   height: "auto",

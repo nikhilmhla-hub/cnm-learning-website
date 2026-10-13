@@ -144,7 +144,7 @@ export default function ProblemLeaksSection() {
         <SectionHeading
           eyebrow="PERFORMANCE DIAGNOSTICS"
           title="You Don't Need Another Timetable. You Need to Know What's Actually Stopping You."
-          description="Most students don't have a knowledge problem. They have a performance execution leak."
+          description="Concept gaps, study habits and test strategy can all hold back your marks. Start by finding the issue that matters most."
           center={true}
         />
 

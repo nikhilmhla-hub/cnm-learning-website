@@ -1,5 +1,7 @@
 "use client";
 
+import { startCanvasAnimation } from "../ui/canvasAnimation";
+
 import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
@@ -62,7 +64,7 @@ export default function MethodologySection() {
 
   // Automatic stage rotation BEFORE user interaction ONLY. Permanently stops upon user click.
   useEffect(() => {
-    if (hasUserClicked) return; // Permanently disabled once user clicks any stage card
+    if (hasUserClicked || !inView || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; // Permanently disabled once user clicks any stage card
 
     const timer = setInterval(() => {
       setIsTransitioning(true);
@@ -73,7 +75,7 @@ export default function MethodologySection() {
     }, 6000);
 
     return () => clearInterval(timer);
-  }, [hasUserClicked]);
+  }, [hasUserClicked, inView]);
 
   // Circular System Loop Orbital Canvas
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function MethodologySection() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId;
+    let stopAnimation;
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
@@ -152,14 +154,14 @@ export default function MethodologySection() {
         });
       }
 
-      animationFrameId = requestAnimationFrame(render);
+
     };
 
-    render();
+    stopAnimation = startCanvasAnimation(canvas, render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation();
     };
   }, []);
 

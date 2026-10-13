@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Button from "../ui/Button";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,12 +13,24 @@ export default function Navbar() {
       }
     };
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+        document.querySelector(".mobile-menu-btn")?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [mobileMenuOpen]);
+
+  return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const navItems = [
     { label: "How It Works", href: "/#how-it-works" },
-    { label: "Courses", href: "/#control-room" },
+    { label: "Student System", href: "/#control-room" },
     { label: "For Students", href: "/#for-students" },
     { label: "For Parents", href: "/#for-parents" },
     { label: "For Institutions", href: "/#for-institutions" },
@@ -28,6 +39,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar-foundation">
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <div
         className="container"
         style={{
@@ -75,6 +87,7 @@ export default function Navbar() {
         {/* Desktop Navigation Links */}
         <nav
           className="desktop-nav"
+          aria-label="Main navigation"
           style={{
             display: "flex",
             alignItems: "center",
@@ -124,6 +137,7 @@ export default function Navbar() {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle navigation menu"
           aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-navigation"
           className="mobile-menu-btn"
           style={{
             display: "none",
@@ -159,7 +173,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Navigation Panel */}
       {mobileMenuOpen && (
-        <div
+        <nav id="mobile-navigation" aria-label="Mobile navigation"
           style={{
             position: "absolute",
             top: "76px",
@@ -213,7 +227,7 @@ export default function Navbar() {
           >
             RUN PERFORMANCE AUDIT →
           </a>
-        </div>
+        </nav>
       )}
     </header>
   );

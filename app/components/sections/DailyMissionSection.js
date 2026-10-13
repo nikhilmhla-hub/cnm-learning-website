@@ -1,5 +1,7 @@
 "use client";
 
+import { startCanvasAnimation } from "../ui/canvasAnimation";
+
 import { useState, useEffect, useRef } from "react";
 import SectionHeading from "../ui/SectionHeading";
 
@@ -79,7 +81,7 @@ export default function DailyMissionSection() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId;
+    let stopAnimation;
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
@@ -146,14 +148,14 @@ export default function DailyMissionSection() {
         });
       }
 
-      animationFrameId = requestAnimationFrame(render);
+
     };
 
-    render();
+    stopAnimation = startCanvasAnimation(canvas, render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation();
     };
   }, []);
 
@@ -195,7 +197,7 @@ export default function DailyMissionSection() {
         <SectionHeading
           eyebrow="DAILY EXECUTION ENGINE"
           title="From Diagnosis to Action: How CNM Powers Your Day"
-          description="CNM takes a diagnosed student problem and automatically converts it into specific, measurable daily execution actions."
+          description="Illustrative walkthrough: see how a performance concern can guide daily tasks and a review. The values below are examples, not a student result."
           center={true}
         />
 

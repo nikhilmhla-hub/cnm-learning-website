@@ -95,7 +95,7 @@ export default function Footer() {
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.88rem" }}>
             <li><a href="https://cnm-online-audit.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-gold-bright)", fontWeight: 600 }}>Performance Audit →</a></li>
             <li><Link href="/#control-room" style={{ color: "var(--color-text-secondary)" }}>Student System</Link></li>
-            <li><Link href="/#results" style={{ color: "var(--color-text-secondary)" }}>Performance Tracking</Link></li>
+            <li><Link href="/#blueprint" style={{ color: "var(--color-text-secondary)" }}>90-Day Blueprint</Link></li>
             <li><Link href="/#how-it-works" style={{ color: "var(--color-text-secondary)" }}>Methodology</Link></li>
           </ul>
         </div>

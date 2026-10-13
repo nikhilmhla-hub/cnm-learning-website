@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
       {/* Full Page Live Background */}
       <PrivacyLiveBackground />
 
-      <main style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
+      <main id="main-content" style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
         <div className="container">
           <SectionHeading
             eyebrow="LEGAL & TELEMETRY PROTOCOL"

@@ -26,8 +26,8 @@ export default function HeroSection() {
           <h1 id="hero-title">You Know You<br className={styles.desktopBreak} /> Can Do Better.<span>Let’s Find What’s<br className={styles.desktopBreak} /> Stopping You.</span></h1>
           <p className={styles.description}>Your marks tell you what happened. We help uncover why — then turn focus, revision, accuracy and exam strategy into a measurable plan.</p>
           <div className={styles.actions}>
-            <a className={`btn btn-primary ${styles.primary}`} href={AUDIT_URL} target="_blank" rel="noopener noreferrer">Start My Performance Audit <span aria-hidden="true">↗</span></a>
-            <a className={styles.secondary} href="#control-room">Explore the student system <span aria-hidden="true">→</span></a>
+            <a className={`btn btn-primary ${styles.primary}`} href={AUDIT_URL}>Start My Performance Audit <span aria-hidden="true">↗</span></a>
+            <a className={styles.secondary} href="/demo">Explore the student system <span aria-hidden="true">→</span></a>
           </div>
           <p className={styles.note}>Start with your preparation. See what needs a closer look.</p>
         </div>

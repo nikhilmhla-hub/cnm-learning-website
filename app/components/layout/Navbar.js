@@ -7,7 +7,7 @@ import styles from "./Navigation.module.css";
 
 const links = [
   ["Students", "/students"], ["Parents", "/parents"], ["Partners", "/partners"],
-  ["How it works", "/#how-it-works"], ["About", "/about"],
+  ["See the process", "/demo"], ["Programmes & fees", "/programmes"],
 ];
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -28,9 +28,9 @@ export default function Navbar() {
     <div className={`container ${styles.row}`}>
       <Link href="/" className={styles.brand} aria-label="CNM System Labs home"><span>CNM</span><span>SYSTEM <b>LABS</b></span></Link>
       <nav className={styles.desktop} aria-label="Main navigation">{links.map(([label,href])=><Link key={href} href={href} aria-current={pathname===href?"page":undefined}>{label}</Link>)}</nav>
-      <a className={styles.audit} href={AUDIT_URL} target="_blank" rel="noopener noreferrer">Start performance audit <span aria-hidden="true">↗</span></a>
+      <Link className={styles.audit} href={AUDIT_URL}>Start performance audit <span aria-hidden="true">→</span></Link>
       <button ref={toggle} type="button" aria-label={open?"Close navigation":"Open navigation"} aria-expanded={open} aria-controls="mobile-navigation" onClick={()=>setOpen(value=>!value)} className={styles.toggle}><span aria-hidden="true">{open ? "×" : "☰"}</span></button>
     </div>
-    <nav id="mobile-navigation" hidden={!open} className={styles.mobile} aria-label="Mobile navigation">{links.map(([label,href])=><Link key={href} href={href} aria-current={pathname===href?"page":undefined} onClick={()=>setOpen(false)}>{label}<span aria-hidden="true">→</span></Link>)}<Link href="/contact" onClick={()=>setOpen(false)}>Contact CNM <span aria-hidden="true">→</span></Link><a href={AUDIT_URL} target="_blank" rel="noopener noreferrer" onClick={()=>setOpen(false)} className={styles.mobileAudit}>Start performance audit ↗</a></nav>
+    <nav id="mobile-navigation" hidden={!open} className={styles.mobile} aria-label="Mobile navigation">{links.map(([label,href])=><Link key={href} href={href} aria-current={pathname===href?"page":undefined} onClick={()=>setOpen(false)}>{label}<span aria-hidden="true">→</span></Link>)}<Link href="/contact" onClick={()=>setOpen(false)}>Contact CNM <span aria-hidden="true">→</span></Link><Link href={AUDIT_URL} onClick={()=>setOpen(false)} className={styles.mobileAudit}>Start performance audit →</Link></nav>
   </header>;
 }

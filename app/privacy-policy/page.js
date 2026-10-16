@@ -147,6 +147,7 @@ export default function PrivacyPolicyPage() {
       <main id="main-content" style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
         <div className="container">
           <SectionHeading
+            as="h1"
             eyebrow="LEGAL & TELEMETRY PROTOCOL"
             title="Privacy Policy"
             description="How CNM System Labs manages and protects student performance telemetry and diagnostic data."

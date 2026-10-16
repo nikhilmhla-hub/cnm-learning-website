@@ -16,6 +16,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://cnm-learning-website.vercel.app"),
+  openGraph: { type: "website", siteName: "CNM System Labs", locale: "en_IN" },
+  twitter: { card: "summary_large_image" },
   title: "CNM System Labs | Student Performance Intelligence",
   description: "CNM System Labs helps students identify performance gaps, build structured study systems, analyze test performance and track measurable academic improvement.",
 };

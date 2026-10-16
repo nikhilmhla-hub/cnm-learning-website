@@ -1,40 +1,39 @@
+import Link from "next/link";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-
 import HeroSection from "./components/sections/HeroSection";
-import ProblemLeaksSection from "./components/sections/ProblemLeaksSection";
-import MethodologySection from "./components/sections/MethodologySection";
-import ProductControlRoomSection from "./components/sections/ProductControlRoomSection";
-import DailyMissionSection from "./components/sections/DailyMissionSection";
-import BlueprintSection from "./components/sections/BlueprintSection";
-import VisualLearningSection from "./components/sections/VisualLearningSection";
-import StudentTypesSection from "./components/sections/StudentTypesSection";
-import ParentsSection from "./components/sections/ParentsSection";
-import InstitutionsSection from "./components/sections/InstitutionsSection";
-import FAQSection from "./components/sections/FAQSection";
-import FinalCTASection from "./components/sections/FinalCTASection";
-import ContactSection from "./components/sections/ContactSection";
+import ToolWalkthrough from "./components/visitors/ToolWalkthrough";
+import { Action, Heading, FAQ, ReviewExample, styles } from "./components/visitors/Shared";
+import { AUDIT_URL, homeFAQs, programmes } from "./components/visitors/content";
 
 export default function Home() {
-  return (
-    <div style={{ backgroundColor: "var(--color-background)", minHeight: "100vh" }}>
-      <Navbar />
-      <main id="main-content">
-        <HeroSection />
-        <ProblemLeaksSection />
-        <MethodologySection />
-        <ProductControlRoomSection />
-        <DailyMissionSection />
-        <BlueprintSection />
-        <VisualLearningSection />
-        <StudentTypesSection />
-        <ParentsSection />
-        <InstitutionsSection />
-        <FAQSection />
-        <FinalCTASection />
-        <ContactSection />
-      </main>
-      <Footer />
-    </div>
-  );
+  return <><Navbar /><main id="main-content" className={styles.page}>
+    <HeroSection />
+    <section className={styles.section} id="your-starting-point"><div className="container"><Heading eyebrow="CHOOSE YOUR STARTING POINT" title="Different questions. A clearer path for each." description="Explore the part of CNM that matters to you." /><div className={styles.routes}>
+      <Link href="/students" className={styles.routeCard} id="for-students"><span className={styles.routeNumber}>01 / STUDENTS <span aria-hidden="true">↗</span></span><h3>Make your effort count.</h3><p>Understand where you get stuck. See how planning, practice and test review fit into your preparation.</p><span className={styles.routeLink}>Explore student support →</span></Link>
+      <Link href="/parents" className={styles.routeCard} id="for-parents"><span className={styles.routeNumber}>02 / PARENTS <span aria-hidden="true">↗</span></span><h3>Understand what’s happening.</h3><p>Look beyond the score. Know what to ask, what progress to review and what to clarify before enrolment.</p><span className={styles.routeLink}>Explore the parent guide →</span></Link>
+      <Link href="/partners" className={styles.routeCard} id="for-institutions"><span className={styles.routeNumber}>03 / PARTNERS <span aria-hidden="true">↗</span></span><h3>Build something useful.</h3><p>For schools, coaching teams, educators and collaborators exploring better support for students.</p><span className={styles.routeLink}>Explore a collaboration →</span></Link>
+    </div></div></section>
+    <section id="how-it-works" className={styles.section}><div className={`container ${styles.split}`}><div id="problem-leaks"><Heading eyebrow="HOW CNM WORKS" title="A score is an outcome. Look at what led to it." description="A concept gap needs a different response from a revision gap. So does rushing a question, avoiding a mock or struggling to start." /><div className={styles.steps}>{[
+      ["Understand the starting point", "Use your audit answers, recent tests and study routine to identify what needs a closer look."],
+      ["Choose a specific next action", "Set a priority. Match the learning, practice or study habit to the problem you are working on."],
+      ["Review, then adjust", "Compare planned work with completed work. Revisit recurring mistakes and adapt the next week."],
+    ].map(([title,description],i)=><div className={styles.step} key={title}><span>0{i+1}</span><div><h3>{title}</h3><p>{description}</p></div></div>)}</div></div><aside className={styles.storyPanel}><span>AN ILLUSTRATIVE EXAMPLE / TEST REVIEW</span><h3>“I knew the chapter.<br />Why did I lose the marks?”</h3>{[
+      ["Notice the pattern", "Several mistakes came from missed units or question constraints."],
+      ["Choose the response", "Practise a short set with a deliberate reading and checking routine."],
+      ["Look for evidence", "Review whether the same mistakes recur in the next timed set."],
+    ].map(([title,description])=><div className={styles.storyRow} key={title}><span aria-hidden="true">↗</span><div><strong>{title}</strong><p>{description}</p></div></div>)}<p className={styles.finePrint}>An example of the reasoning, not a diagnosis or a promise of recovered marks.</p></aside></div></section>
+    <ToolWalkthrough />
+    <section className={styles.section} id="methodology"><div className="container"><Heading eyebrow="THE FIVE AREAS OF CNM" title="Support the whole preparation system." description="These areas work together. The right starting point depends on the student; everyone does not need the same intervention." /><div className={styles.modules}>{programmes.map((programme,i)=><article className={styles.module} key={programme.name}><span>0{i+1}</span><h3>{programme.name}</h3><div><strong>{programme.focus}</strong><p>{programme.description}</p></div></article>)}</div><div id="blueprint" className={styles.actions}><Action href="/students#blueprint" secondary>Explore a 90-day plan</Action><Link className={styles.textLink} href="/students#programme-fit">Choose the right support →</Link></div></div></section>
+    <section className={styles.section}><div className={`container ${styles.split}`}><div><Heading eyebrow="FOR PARENTS" title="Clarity without the constant pressure." description="A useful conversation goes beyond ‘How many hours?’ or ‘How many marks?’ Look at the work, the difficulty and the next change together." /><Action href="/parents">Read the parent guide</Action><p className={styles.finePrint}>Includes the questions to ask before choosing a programme.</p></div><ReviewExample /></div></section>
+    <section className={styles.bridge}><div className={`container ${styles.split}`}><div><span className={styles.kicker}>SCHOOLS · COACHING · EDUCATORS · COLLABORATORS</span><h2>Better student support starts with a shared problem.</h2></div><div><p>Explore a focused pilot or a collaboration in learning, practice or student support. Begin with the students you serve and the problem you want to solve.</p><div className={styles.actions}><Action href="/partners">Explore partnerships</Action><Action href="/partners#talk" secondary>Discuss an idea</Action></div></div></div></section>
+    <section className={styles.section}><div className="container"><Heading eyebrow="TRUST THE WORK, NOT THE PROMISE" title="An approach you can inspect." description="Before you choose support, ask to see how it will work in your situation." /><div className={styles.principles}>{[
+      ["01 / SEE THE APPROACH", "Examples you can question.", "Explore the tools and the reasoning. Interface previews and illustrative examples are labelled as examples."],
+      ["02 / AGREE THE SCOPE", "Know what you are choosing.", "Clarify the modules, duration, support, review arrangements and total fees before enrolment."],
+      ["03 / REVIEW THE EVIDENCE", "Look at work and test patterns.", "Check consistency, recall and repeated errors over time. Specific scores, ranks and admissions are not guaranteed."],
+    ].map(([label,title,description])=><article className={styles.principle} key={label}><span>{label}</span><h3>{title}</h3><p>{description}</p></article>)}</div><Link className={styles.textLink} href="/about">Meet the thinking behind CNM →</Link></div></section>
+    <FAQ items={homeFAQs} />
+    <section id="audit" className={styles.contactSection}><div className={`container ${styles.split}`}><div><span className={styles.kicker}>YOUR NEXT STEP</span><h2 style={{fontSize:"clamp(2.4rem,4.5vw,4rem)",fontWeight:500,letterSpacing:"-.05em",lineHeight:1.15,margin:"20px 0"}}>Stop guessing.<br /><span style={{color:"#e6c779"}}>Start understanding.</span></h2><p>Begin with your preparation, not a preselected package.</p></div><div><p>The audit is a starting point for a better conversation about your focus, revision, test habits and execution.</p><div className={styles.actions}><Action href={AUDIT_URL}>Start performance audit</Action><Action href="/contact" secondary>Talk to CNM first</Action></div><p className={styles.finePrint}>Opens CNM’s assessment site. Parents and partners can contact CNM directly.</p></div></div></section>
+    <div id="contact"><div className="container" style={{paddingTop:28,paddingBottom:28,display:"flex",flexWrap:"wrap",justifyContent:"space-between",gap:16}}><span style={{fontSize:".85rem",color:"#b5b5be"}}>A question before you begin?</span><Link href="/contact" style={{fontSize:".85rem"}}>Choose the right contact route →</Link></div></div>
+  </main><Footer /></>;
 }

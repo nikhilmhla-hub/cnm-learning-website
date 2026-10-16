@@ -145,6 +145,7 @@ export default function TermsOfServicePage() {
       <main id="main-content" style={{ paddingTop: "120px", paddingBottom: "7rem", position: "relative", zIndex: 2 }}>
         <div className="container">
           <SectionHeading
+            as="h1"
             eyebrow="TERMS & CONDITIONS"
             title="Terms of Service"
             description="Terms and conditions governing the use of CNM System Labs diagnostic tools and telemetry platform."

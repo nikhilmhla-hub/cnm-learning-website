@@ -449,3 +449,9 @@ section[id] { scroll-margin-top: 96px; }
   .navbar-foundation .mobile-menu-btn { display: flex !important; min-height: 44px; min-width: 44px; }
 }
 #mobile-navigation { max-height: calc(100dvh - 76px); overflow-y: auto; }
+
+[hidden] { display:none !important; }
+button, input, textarea, select { font:inherit; }
+::selection { background:#e6c779; color:#111216; }
+
+:target { scroll-margin-top:100px; }

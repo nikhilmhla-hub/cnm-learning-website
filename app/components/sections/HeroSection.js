@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
+import { AUDIT_URL } from "../visitors/content";
 import styles from "./HeroSection.module.css";
 
 const examples = [
@@ -19,14 +21,15 @@ export default function HeroSection() {
       <div className={`container ${styles.grid}`}>
         <div className={styles.copy}>
           <div className={styles.eyebrow}><span /> CNM SYSTEM LABS</div>
+          <nav className={styles.visitorLinks} aria-label="Choose your visitor journey"><Link href="/students">For students →</Link><Link href="/parents">For parents →</Link><Link href="/partners">For partners →</Link></nav>
           <p className={styles.audience}>FOR JEE & NEET · CLASS XI, XII & DROPPERS</p>
           <h1 id="hero-title">You Know You<br className={styles.desktopBreak} /> Can Do Better.<span>Let’s Find What’s<br className={styles.desktopBreak} /> Stopping You.</span></h1>
           <p className={styles.description}>Your marks tell you what happened. We help uncover why — then turn focus, revision, accuracy and exam strategy into a measurable plan.</p>
           <div className={styles.actions}>
-            <a className={`btn btn-primary ${styles.primary}`} href="https://cnm-online-audit.vercel.app/" target="_blank" rel="noopener noreferrer">Find What’s Holding You Back <span aria-hidden="true">↗</span></a>
+            <a className={`btn btn-primary ${styles.primary}`} href={AUDIT_URL} target="_blank" rel="noopener noreferrer">Start My Performance Audit <span aria-hidden="true">↗</span></a>
             <a className={styles.secondary} href="#control-room">Explore the student system <span aria-hidden="true">→</span></a>
           </div>
-          <p className={styles.note}>Start with the performance audit. Build from what you learn.</p>
+          <p className={styles.note}>Start with your preparation. See what needs a closer look.</p>
         </div>
         <div className={styles.lab}>
           <div className={styles.labHeader}><span><i /> THE PERFORMANCE LAB</span><span className={styles.exampleBadge}>INTERACTIVE EXAMPLE</span></div>

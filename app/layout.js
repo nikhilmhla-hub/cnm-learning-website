@@ -1,5 +1,6 @@
 import { Plus_Jakarta_Sans, DM_Sans } from "next/font/google";
 import "./globals.css";
+import RouteTransitions from "./components/visitors/RouteTransitions";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-heading",
@@ -26,7 +27,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${dmSans.variable}`}>
-      <body>{children}</body>
+      <body><RouteTransitions />{children}</body>
     </html>
   );
 }

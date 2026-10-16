@@ -1,4 +1,4 @@
-export const AUDIT_URL = "https://cnm-online-audit.vercel.app/audit";
+export const AUDIT_URL = "/audit";
 export const EMAIL = "info@cnmlearning.com";
 export const PHONE = "+91 6377525604";
 export const PHONE_URL = "tel:+916377525604";
@@ -14,7 +14,7 @@ export const homeFAQs = [
   ["Is this useful if I already attend coaching?", "It can be. Your classes may cover the syllabus while you still need help with revision, consistency, test review or exam execution. Discuss your current routine with CNM before choosing support so the two fit together."],
   ["What happens after I start the audit?", "The audit asks about your preparation and study habits. Treat the answers as a starting point to discuss, alongside recent tests and examples of your work. A self-report alone cannot establish the exact cause of a low score."],
   ["Will CNM guarantee a rank or score increase?", "No. Results depend on your starting point, preparation, exam conditions and follow-through. Review changes in your work and test performance over time; a target is not a guaranteed outcome."],
-  ["How do I choose a programme or understand the fees?", "Speak to CNM about your class, exam and the problem you want to solve. Ask for the selected modules, duration, support, review frequency and complete fee breakdown in writing before enrolment."],
+  ["How do I choose a programme or understand the fees?", "See the Programmes & fees page for the fee guide. Ask CNM to confirm the selected modules, access duration, support, review frequency, tax treatment and final payable amount in writing before enrolment."],
 ];
 export function enquiryLink(audience = "student") {
   const subjects = { student: "Student performance enquiry", parent: "Parent enquiry about CNM support", partner: "Partnership discussion with CNM System Labs", general: "Enquiry about CNM System Labs" };

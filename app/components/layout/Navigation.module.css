@@ -1,0 +1,18 @@
+.header { position:sticky; top:0; z-index:100; background:#090a0cf0; backdrop-filter:blur(16px); border-bottom:1px solid #ffffff15; }
+.row { display:flex; align-items:center; justify-content:space-between; gap:22px; min-height:78px; }
+.brand { display:flex; align-items:center; gap:11px; flex-shrink:0; color:#ededf1; font-weight:600; font-size:1rem; letter-spacing:-.03em; }
+.brand > span:first-child { display:grid; place-items:center; height:32px; width:48px; background:linear-gradient(115deg,#f1d993,#d6b35c); color:#14120c; border-radius:5px; letter-spacing:.04em; font-size:.75rem; font-weight:800; }
+.brand b { color:#e6c779; font-weight:600; }
+.desktop { display:flex; align-items:center; gap:26px; }
+.desktop a { font-size:.8rem; color:#b7b7c0; padding:12px 0; white-space:nowrap; }
+.desktop a:hover,.desktop a[aria-current] { color:#e6c779; }
+.audit { display:inline-flex; align-items:center; justify-content:center; gap:15px; padding:11px 16px; background:#e6c779; color:#17140c; border:1px solid #e6c779; border-radius:6px; font-size:.75rem; font-weight:700; min-height:44px; }
+.audit:hover { background:#f1d993; color:#17140c; }
+.toggle { display:none; place-items:center; min-width:44px; min-height:44px; border:1px solid #e6c77950; border-radius:6px; background:transparent; color:#e6c779; font-size:1.35rem; cursor:pointer; }
+.mobile { display:none; position:absolute; top:100%; inset-inline:0; max-height:calc(100dvh - 78px); overflow-y:auto; background:#111216; padding:15px 24px 25px; border-bottom:1px solid #e6c77950; box-shadow:0 18px 50px #0006; }
+.mobile[hidden] { display:none; }
+.mobile a { display:flex; align-items:center; justify-content:space-between; min-height:50px; color:#e0e0e6; font-size:.95rem; border-bottom:1px solid #ffffff16; }
+.mobile a[aria-current] { color:#e6c779; }
+.mobile .mobileAudit { justify-content:center; color:#14120c; background:#e6c779; border-radius:6px; margin-top:18px; padding:12px 15px; }
+@media (max-width:1020px) { .desktop { display:none; } .toggle { display:grid; } .mobile { display:block; } .audit { margin-left:auto; } }
+@media (max-width:580px) { .audit { display:none; } .brand { font-size:.9rem; } .row { min-height:70px; } .mobile { max-height:calc(100dvh - 70px); } }

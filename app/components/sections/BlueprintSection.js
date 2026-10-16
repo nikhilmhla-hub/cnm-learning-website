@@ -16,7 +16,7 @@ export default function BlueprintSection() {
         <div className={styles.measure}><span>WHAT TO REVIEW</span><p>{phase.measure}</p></div>
       </article>)}</div>
       <p className={styles.note}>Targets are set from your baseline and reviewed along the way. Marks and rank improvements are not guaranteed.</p>
-      <div className={styles.cta}><a className="btn btn-primary" href="https://cnm-online-audit.vercel.app/" target="_blank" rel="noopener noreferrer">Start with your performance audit ↗</a></div>
+      <div className={styles.cta}><a className="btn btn-primary" href="https://cnm-online-audit.vercel.app/audit" target="_blank" rel="noopener noreferrer">Start with your performance audit ↗</a></div>
     </div>
   </section>;
 }

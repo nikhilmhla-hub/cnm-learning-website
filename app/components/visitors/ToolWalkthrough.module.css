@@ -1,0 +1,24 @@
+.section { padding:85px 0; background:#eae5d9; color:#202329; }
+.heading { max-width:700px; }
+.heading > span { font-size:.65rem; color:#76602f; font-weight:700; letter-spacing:.14em; }
+.heading h2 { font-size:clamp(2rem,3.4vw,3rem); font-weight:500; letter-spacing:-.045em; color:#202329; margin:16px 0; }
+.heading p { color:#5f6168; font-size:1rem; line-height:1.85; }
+.tabs { display:flex; flex-wrap:wrap; gap:10px; margin:30px 0; }
+.tabs button { display:flex; align-items:center; justify-content:space-between; gap:25px; padding:13px 18px; min-height:48px; border:1px solid #26293030; border-radius:6px; color:#50535a; background:transparent; font:inherit; font-size:.8rem; cursor:pointer; transition:background .2s,color .2s; }
+.tabs button[aria-pressed=true] { background:#202329; border-color:#202329; color:#eee9df; }
+.tabs button:hover { border-color:#202329; }
+.grid { display:grid; grid-template-columns:.65fr 1.35fr; gap:45px; align-items:center; }
+.copy > span { color:#786333; font-size:.62rem; letter-spacing:.1em; }
+.copy h3 { color:#202329; font-size:1.8rem; font-weight:500; margin:20px 0 14px; letter-spacing:-.04em; }
+.copy p { color:#5f6168; font-size:.9rem; line-height:1.9; }
+.copy ul { list-style:none; margin-top:25px; display:grid; gap:13px; }
+.copy li { display:flex; gap:12px; font-size:.82rem; line-height:1.8; }
+.copy li::before { content:'↗'; color:#8c722e; }
+.copy a { display:inline-block; font-size:.8rem; color:#70551a; margin-top:28px; padding:10px 0; }
+.screen { min-width:0; background:#101115; border-radius:12px; padding:14px; box-shadow:0 22px 50px #20232920; border:1px solid #292c31; }
+.screenTop { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#9c9ca7; font-size:.6rem; padding:3px 4px 13px; }
+.screenTop > span:first-child { color:#c6ab63; font-size:.65rem; letter-spacing:3px; }
+.screenTop > span:last-child { font-size:.5rem; letter-spacing:.06em; }
+.imageFrame { position:relative; aspect-ratio:1.55; background:#080a0d; border-radius:5px; overflow:hidden; }
+.screen figcaption { color:#9f9fa8; font-size:.61rem; line-height:1.7; padding:11px 4px 1px; }
+@media (max-width:760px) { .section { padding:58px 0; } .grid { grid-template-columns:1fr; gap:25px; } .copy ul { margin-top:18px; } .copy a { margin-top:14px; } .tabs { display:grid; grid-template-columns:1fr; gap:8px; margin:25px 0; } .tabs button { min-height:48px; } .screen { padding:10px; } .screenTop > span:last-child { display:none; } }

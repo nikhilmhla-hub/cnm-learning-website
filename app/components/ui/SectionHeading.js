@@ -1,4 +1,5 @@
 export default function SectionHeading({
+  as: HeadingTag = "h2",
   eyebrow,
   title,
   description,
@@ -13,7 +14,7 @@ export default function SectionHeading({
       } ${className}`.trim()}
     >
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-      {title && <h2 className="section-title">{title}</h2>}
+      {title && <HeadingTag className="section-title">{title}</HeadingTag>}
       {description && <p className="section-description">{description}</p>}
     </div>
   );

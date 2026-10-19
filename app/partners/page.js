@@ -46,7 +46,7 @@ export default function Partners() {
           Explore the possibilities
         </Action>
         <Action href="/demo" secondary>
-          Try the sample walkthrough
+          Explore the dashboard workflow
         </Action>
         <Action href="/programmes" secondary>
           Programmes & fees

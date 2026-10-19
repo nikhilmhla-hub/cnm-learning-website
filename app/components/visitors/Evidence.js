@@ -1,48 +1,11 @@
+import Link from "next/link";
 import { Heading, Action, styles } from "./Shared";
+import { scenarios } from "./scenarios";
 export default function Evidence() {
-  return (
-    <section id="evidence" className={styles.section}>
-      <div className="container">
-        <Heading
-          eyebrow="EVIDENCE / WHAT YOU CAN VERIFY"
-          title="Inspect the work behind the claim."
-          description="A useful student case needs a starting point, a timeframe, the support delivered and comparable evidence of what changed."
-        />
-        <div className={styles.principles}>
-          {[
-            [
-              "STARTING POINT",
-              "What was difficult?",
-              "Look for the original test or work pattern and the preparation context, not just a final score.",
-            ],
-            [
-              "PROCESS",
-              "What actually happened?",
-              "Check the duration, the actions completed and the human support provided.",
-            ],
-            [
-              "OUTCOME",
-              "What changed, and how was it checked?",
-              "Compare like-for-like work or tests and acknowledge other influences. A testimonial alone does not establish causation.",
-            ],
-          ].map(([label, title, text]) => (
-            <article className={styles.principle} key={label}>
-              <span>{label}</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-        <p className={styles.finePrint}>
-          No verified, consented student outcome cases are published on this
-          site yet. The walkthrough and interface previews are examples, not
-          outcome evidence. Ask CNM what can be substantiated and shared with
-          permission before relying on a result claim.
-        </p>
-        <Action href="/contact" secondary>
-          Ask about evidence & an actual demonstration
-        </Action>
-      </div>
-    </section>
-  );
+  return <section id="evidence" className={styles.section}><div className="container">
+    <Heading eyebrow="PREPARATION SCENARIOS / ILLUSTRATIVE" title="Different problems. Different next steps." description="See how CNM’s tools can support a more specific response to familiar preparation difficulties." />
+    <div className={styles.principles}>{scenarios.map((item, i) => <article className={styles.principle} key={item.id}><span>0{i + 1} / {item.label.toUpperCase()}</span><h3>{item.title}</h3><p>{item.context}</p><p><strong>What to review next:</strong> {item.review}</p><Link className={styles.textLink} href={`/case-studies#${item.id}`}>Explore this scenario →</Link></article>)}</div>
+    <p className={styles.finePrint}>Illustrative situations, not student case histories, testimonials or measured CNM outcomes. They explain the approach; they do not predict a student’s result.</p>
+    <div className={styles.actions}><Action href="/case-studies">Explore the preparation scenarios</Action><Action href="/demo" secondary>Try the dashboard workflow</Action></div>
+  </div></section>;
 }

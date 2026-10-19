@@ -15,7 +15,7 @@ export default function GuidedDemo() {
   const tools = selected === 2 ? ["90-Day Blueprint", ...defaultTools.slice(1)] : selected === 1 ? ["Mock Test Autopsy", "Review Queue + Planner", ...defaultTools.slice(2)] : defaultTools;
   function reset(index = selected) { setSelected(index); setStage(0); setScheduled(false); setCompleted(false); }
   return <section id="walkthrough" className={styles.section}><div className="container">
-    <div className={styles.disclosure}><span>BASED ON THE CURRENT CNM DASHBOARD</span><p>An interactive guide to the tools in CNM’s current dashboard source. All records below are fictional. This is a simplified website preview, not a live student account or a screen recording. Nothing is sent or saved to the dashboard.</p></div>
+    <div className={styles.disclosure}><span>BASED ON THE CURRENT CNM DASHBOARD</span><p>A simplified, interactive preview of CNM’s dashboard workflow using fictional records. Try the controls; nothing is sent or saved to a student account.</p></div>
     <div className={styles.scenarios} role="group" aria-label="Choose a preparation example">{scenarios.map((s, i) => <button key={s.id} type="button" aria-pressed={selected === i} onClick={() => reset(i)}>{s.label}</button>)}</div>
     <div className={styles.shell}>
       <div className={styles.topbar}><div><span className={styles.logo}>CNM</span><strong>STUDENT OS <small>REFOCUS / GUIDED PREVIEW</small></strong></div><span className={styles.sample}>SAMPLE DATA</span></div>
@@ -29,6 +29,6 @@ export default function GuidedDemo() {
         </div>
       </div>
     </div>
-    <div className={styles.bottom}><p>Tool names and connections are based on the dashboard source supplied by CNM. Access and human review arrangements depend on the agreed programme.</p><Link href="/programmes">Programmes, support & fees →</Link></div>
+    <div className={styles.bottom}><p>Explore the student workflow at your own pace. Tool access and human review arrangements depend on the agreed programme.</p><Link href="/programmes">Programmes, support & fees →</Link></div>
   </div></section>;
 }
